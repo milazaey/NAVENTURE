@@ -432,7 +432,7 @@ class _BookingPageState extends State<BookingPage> {
                           // 1. Lempar total harganya
                           totalBayar: totalHarga,
 
-                          // 2. Lempar metode pembayarannya PAKE VARIABEL
+                          // 2. Lempar metode pembayarannya PAKE VARIABELgit
                           paymentMethod: selectedPayment,
                         ),
                       ),
