@@ -5,9 +5,84 @@ import '../../utils/theme.dart';
 import 'favorite_page.dart';
 import 'ticket_page.dart';
 import 'emergency_page.dart';
+import 'dart:io'; // Tambahin ini buat baca file gambar
+import 'package:image_picker/image_picker.dart'; // Tambahin ini buat galeri
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  // 1. Siapkan Variabel Penampung
+  String userName = 'Maki Zenin';
+  String userEmail = 'zenin_makin@email.com';
+  File? _imageFile; // Buat nyimpen gambar dari galeri
+
+  // 2. Fungsi buat ngambil gambar dari galeri
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  // 3. Fungsi buat nampilin Popup Edit Nama & Email
+  void _showEditPopup() {
+    TextEditingController nameController = TextEditingController(
+      text: userName,
+    );
+    TextEditingController emailController = TextEditingController(
+      text: userEmail,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Profil'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nama'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Batal
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Simpan perubahan dan refresh layar (setState)
+                setState(() {
+                  userName = nameController.text;
+                  userEmail = emailController.text;
+                });
+                Navigator.pop(context); // Tutup popup
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,46 +134,64 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                              image: AssetImage('assets/img/profile.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                            border: Border.all(color: Colors.white, width: 3),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
+                        // --- BAGIAN FOTO ---
+                        GestureDetector(
+                          onTap: _pickImage, // Kalo foto diklik, buka galeri
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              // Cek apakah ada file gambar baru? Kalo gak ada, pake asset bawaan
+                              image: DecorationImage(
+                                image: _imageFile != null
+                                    ? FileImage(_imageFile!)
+                                          as ImageProvider // <--- Pake foto dari galeri (File)
+                                    : const AssetImage(
+                                        'assets/img/profile.jpg',
+                                      ), // <--- Pake foto bawaan (Asset)
+                                fit: BoxFit.cover,
                               ),
-                            ],
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+
+                        // --- BAGIAN ICON PENSIL ---
                         Positioned(
                           bottom: 0,
                           right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 14,
-                              color: Colors.black,
+                          child: GestureDetector(
+                            onTap:
+                                _showEditPopup, // Kalo pensil diklik, buka popup edit nama/email
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                size: 14,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
+
+                    // --- NAMA (Pake Variabel) ---
                     Text(
-                      'Maki Zenin',
+                      userName,
                       style: poppinsText.copyWith(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -106,8 +199,10 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
+
+                    // --- EMAIL (Pake Variabel) ---
                     Text(
-                      'zenin_makin@email.com',
+                      userEmail,
                       style: interText.copyWith(fontSize: 14, color: greyColor),
                     ),
                   ],
@@ -147,7 +242,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 12),
               _buildMenuItem(
                 icon: Icons.help_outline,
-                title: 'Pusat Bantuan',
+                title: 'Layanan Darurat',
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
