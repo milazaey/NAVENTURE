@@ -169,8 +169,9 @@ class _DetailPageState extends State<DetailPage> {
                       Row(
                         children: [
                           _buildInfoChip(
-                            Icons.access_time_filled,
-                            '± 1,5 jam dari alun-alun',
+                            Icons
+                                .location_on_outlined, // Ikon diganti jadi pin lokasi/map biar nyambung sama jarak
+                            '± ${widget.wisata.distance} dari alun-alun', // Mangggil data jarak secara dinamis
                           ),
                         ],
                       ),
@@ -178,8 +179,11 @@ class _DetailPageState extends State<DetailPage> {
                       Row(
                         children: [
                           _buildInfoChip(
-                            Icons.schedule,
-                            widget.wisata.openHours,
+                            Icons
+                                .access_time_rounded, // Kita balikin jadi ikon jam bulat biar estetik
+                            widget
+                                .wisata
+                                .openHours, // <--- NOTE: Sesuaikan openHours dengan nama properti di wisata_model.dart lu (misal: openHours, jamOperasional, atau operationalHours)
                           ),
                           const SizedBox(width: 12),
                           _buildInfoChip(

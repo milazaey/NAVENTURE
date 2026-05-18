@@ -61,7 +61,7 @@ class _FilterPageState extends State<FilterPage> {
       case 'agrowisata':
         return Icons.eco;
       default:
-        return Icons.explore;
+        return Icons.eco;
     }
   }
 
@@ -77,66 +77,88 @@ class _FilterPageState extends State<FilterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- TOP BAR ---
+                // --- ONE ROW TOP BAR (Back + Logo + Search Bar) ---
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 15,
-                  ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.grey.shade100,
-                          child: const Icon(
-                            Icons.arrow_back_ios_new,
-                            size: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Masukin fungsi search ke sini boi
-                      Expanded(child: _buildSearchBar(_onSearchChanged)),
-                    ],
-                  ),
-                ),
-
-                // --- INDIKATOR KATEGORI ---
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(
+                    24,
+                    20,
+                    24,
+                    10,
+                  ), // Kasih space atas dikit biar lega boi
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(color: Colors.black12, blurRadius: 10),
-                          ],
-                        ),
-                        child: Icon(
-                          _getCategoryIcon(widget.categoryName),
-                          color: Colors.black,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Tombol Back di paling kiri boi
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 4,
+                            ), // Biar center vertikal sama logo bulat
+                            child: GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.grey.shade100,
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+
+                          // 2. Logo Kategori & Teks di bawahnya (di tengah-tengah)
+                          Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  _getCategoryIcon(widget.categoryName),
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                widget.categoryName.replaceAll('\n', ' '),
+                                style: interText.copyWith(
+                                  color: greyColor,
+                                  fontSize:
+                                      12, // Dikecilin dikit biar makin proporsional
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12),
+
+                          // 3. Search bar di paling kanan
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 2,
+                              ), // Biar center vertikal juga
+                              child: _buildSearchBar(_onSearchChanged),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 20),
+
+                      // Judul ala Prototype
                       Text(
-                        widget.categoryName.replaceAll('\n', ' '),
-                        style: interText.copyWith(
-                          color: greyColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Destinasi Terfilter',
+                        'Hidden gems ${widget.categoryName.toLowerCase().replaceAll('\n', ' ')}',
                         style: poppinsText.copyWith(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -173,7 +195,7 @@ class _FilterPageState extends State<FilterPage> {
     );
   }
 
-  // Tambahin parameter onChanged biar TextField-nya bisa dengerin ketikan lo
+  // Widget Search Bar tetap utuh
   Widget _buildSearchBar(Function(String) onChanged) {
     return Container(
       height: 45,
@@ -187,7 +209,7 @@ class _FilterPageState extends State<FilterPage> {
         children: [
           Expanded(
             child: TextField(
-              onChanged: onChanged, // <--- Ini kuncinya boi!
+              onChanged: onChanged,
               decoration: InputDecoration(
                 hintText:
                     'Cari di ${widget.categoryName.replaceAll('\n', ' ')}...',
