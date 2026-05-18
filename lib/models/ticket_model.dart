@@ -2,8 +2,7 @@ class Ticket {
   final String id;
   final String title;
   final String location;
-  final int adultCount;
-  final int childCount;
+  final int adultCount; // Sekarang ini merepresentasikan total tiket utama
   final int motorCount;
   final int carCount;
   final int guideCount;
@@ -14,7 +13,7 @@ class Ticket {
     required this.title,
     required this.location,
     required this.adultCount,
-    required this.childCount,
+    // childCount udah dihapus dari sini
     required this.motorCount,
     required this.carCount,
     required this.guideCount,

@@ -14,17 +14,15 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   // Logic perhitungan
-  int adultCount = 0;
-  int childCount = 0;
+  int adultCount = 0; // Sekarang ini merepresentasikan total tiket masuk utama
   int motorCount = 0;
   int carCount = 0;
   int guideCount = 0;
 
-  // 2. Deklarasi variabel harga (nanti diisi di initState)
+  // Deklarasi variabel harga
   late int adultPrice;
-  late int childPrice;
 
-  // Harga tambahan biasanya tetap, tapi bisa lo sesuaikan
+  // Harga tambahan
   int motorPrice = 5000;
   int carPrice = 10000;
   int guidePrice = 100000;
@@ -32,10 +30,8 @@ class _BookingPageState extends State<BookingPage> {
   @override
   void initState() {
     super.initState();
-    // Kita hapus titiknya dulu (kalo ada) baru diubah ke angka.
-    // Kalo tulisannya "Gratis", tryParse bakal gagal dan otomatis kasih angka 0.
+    // Hapus titiknya dulu (kalo ada) baru diubah ke angka.
     adultPrice = int.tryParse(widget.wisata.price.replaceAll('.', '')) ?? 0;
-    childPrice = adultPrice; // Samain harganya atau kasih logika diskon di sini
   }
 
   // State buat milih metode pembayaran
@@ -43,7 +39,6 @@ class _BookingPageState extends State<BookingPage> {
 
   int get totalHarga {
     return (adultCount * adultPrice) +
-        (childCount * childPrice) +
         (motorCount * motorPrice) +
         (carCount * carPrice) +
         (guideCount * guidePrice);
@@ -52,9 +47,7 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF8F9FA,
-      ), // Biar background agak abu kayak di desain
+      backgroundColor: const Color(0xFFF8F9FA),
       body: Stack(
         children: [
           // --- KONTEN UTAMA ---
@@ -126,7 +119,6 @@ class _BookingPageState extends State<BookingPage> {
                               ),
                             ],
                           ),
-                          // Pakai adultPrice (int) buat pengecekan, bukan widget.wisata.price (String)
                           Text(
                             adultPrice == 0
                                 ? 'Gratis'
@@ -163,9 +155,9 @@ class _BookingPageState extends State<BookingPage> {
 
                       const SizedBox(height: 30),
 
-                      // 3. Pilih Tiket
+                      // 3. Pilih Tiket (Sisa 1 doang sekarang)
                       Text(
-                        'Pilih Tiket',
+                        'Kuantitas Tiket',
                         style: poppinsText.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -173,20 +165,10 @@ class _BookingPageState extends State<BookingPage> {
                       ),
                       const SizedBox(height: 16),
                       _buildCounterItem(
-                        'Tiket Dewasa',
-                        adultPrice == 0
-                            ? 'Gratis'
-                            : 'Rp $adultPrice', // GANTI DI SINI
+                        'Tiket Masuk', // Namanya diganti biar general
+                        adultPrice == 0 ? 'Gratis' : 'Rp $adultPrice',
                         adultCount,
                         (val) => setState(() => adultCount = val),
-                      ),
-                      _buildCounterItem(
-                        'Tiket Anak-anak',
-                        childPrice == 0
-                            ? 'Gratis'
-                            : 'Rp $childPrice', // GANTI DI SINI
-                        childCount,
-                        (val) => setState(() => childCount = val),
                       ),
                       const SizedBox(height: 30),
 
@@ -220,7 +202,7 @@ class _BookingPageState extends State<BookingPage> {
 
                       const SizedBox(height: 30),
 
-                      // 5. Metode Pembayaran (BARU)
+                      // 5. Metode Pembayaran
                       Text(
                         'Metode Pembayaran',
                         style: poppinsText.copyWith(
@@ -262,7 +244,7 @@ class _BookingPageState extends State<BookingPage> {
 
                       const SizedBox(height: 30),
 
-                      // 6. Rincian Pembayaran (BARU)
+                      // 6. Rincian Pembayaran
                       Text(
                         'Rincian Pembayaran',
                         style: poppinsText.copyWith(
@@ -281,14 +263,9 @@ class _BookingPageState extends State<BookingPage> {
                         child: Column(
                           children: [
                             _buildSummaryRow(
-                              'Tiket Dewasa',
+                              'Tiket Masuk',
                               adultCount,
                               adultPrice,
-                            ),
-                            _buildSummaryRow(
-                              'Tiket Anak-anak',
-                              childCount,
-                              childPrice,
                             ),
                             _buildSummaryRow(
                               'Biaya Parkir (Motor)',
@@ -329,9 +306,7 @@ class _BookingPageState extends State<BookingPage> {
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 100,
-                      ), // Spasi bawah biar konten nggak ketutup tombol
+                      const SizedBox(height: 100), // Spasi bawah
                     ],
                   ),
                 ),
@@ -405,34 +380,29 @@ class _BookingPageState extends State<BookingPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-
-            // booking_page.dart
-            onPressed: (adultCount + childCount == 0)
-                ? null // Tombol jadi abu-abu/mati kalau belum pilih tiket
+            // Tombol mati kalau adultCount masih 0
+            onPressed: (adultCount == 0)
+                ? null
                 : () {
                     final tiketBaru = Ticket(
                       id: 'NAV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
                       title: widget.wisata.name,
                       location: widget.wisata.location,
                       adultCount: adultCount,
-                      childCount: childCount,
+                      // childCount dihapus dari model
                       motorCount: motorCount,
                       carCount: carCount,
                       guideCount: guideCount,
                       isActive: true,
                     );
-                    // Masukin tiket yang barusan dibikin ke dalam list penyimpanan!
+
                     mockTickets.add(tiketBaru);
 
-                    // Kodingan pindah halamannya:
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => SuccessPage(
-                          // 1. Lempar total harganya
                           totalBayar: totalHarga,
-
-                          // 2. Lempar metode pembayarannya PAKE VARIABELgit
                           paymentMethod: selectedPayment,
                         ),
                       ),
@@ -459,8 +429,7 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // WIDGET BANTUAN DI BAWAH SINI
-
+  // WIDGET BANTUAN
   Widget _buildTextField(String hint) {
     return Container(
       decoration: BoxDecoration(
@@ -543,7 +512,6 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // Widget baru buat milih metode pembayaran
   Widget _buildPaymentMethod(String name, IconData icon, Color iconColor) {
     bool isSelected = selectedPayment == name;
     return GestureDetector(
@@ -572,7 +540,6 @@ class _BookingPageState extends State<BookingPage> {
               ),
             ),
             const Spacer(),
-            // Lingkaran Radio Button
             Container(
               width: 18,
               height: 18,
@@ -602,10 +569,9 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // Widget baru buat nge-print baris rincian pembayaran
   Widget _buildSummaryRow(String title, int count, int price) {
     if (count == 0) {
-      return const SizedBox(); // Kalau kuantitas 0, barisnya sembunyi
+      return const SizedBox();
     }
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),

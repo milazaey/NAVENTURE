@@ -11,8 +11,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Variabel buat ngatur password kelihatan/nggak (ikon mata)
+  // --- TAMBAHAN: Controller buat nangkep input teks ---
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _obscureText = true;
+
+  // --- TAMBAHAN: Jangan lupa di-dispose biar gak bocor memorinya ---
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           // 1. Ornamen Lingkaran Hijau di Kiri Atas
           Positioned(
-            top: -80, // Sesuaikan lagi biar pas sama prototype
+            top: -80,
             left: -80,
             child: Container(
               width: 300,
@@ -30,17 +41,12 @@ class _LoginPageState extends State<LoginPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter, // Mulai dari atas
-                  end: Alignment.bottomCenter, // Arah ke bawah
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
-                    secondaryColor.withValues(
-                      alpha: 1.0,
-                    ), // 100% Opacity (Pekat)
-                    secondaryColor.withValues(alpha: 0.0), // 0% Opacity (Ilang)
+                    secondaryColor.withValues(alpha: 1.0),
+                    secondaryColor.withValues(alpha: 0.0),
                   ],
-                  // --- INI KUNCI BIAR "TAJEM" ---
-                  // 0.0 artinya warna pekat mulai di paling atas
-                  // 0.5 artinya di tengah-tengah lingkaran warnanya udah lunas jadi transparan
                   stops: const [0.0, 1],
                 ),
               ),
@@ -54,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 120), // Jarak dari atas
+                  const SizedBox(height: 120),
                   // --- JUDUL ---
                   Text(
                     'Masuk',
@@ -73,6 +79,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _emailController, // <-- TAMBAHAN
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Masukkan email Anda',
                       hintStyle: interText.copyWith(color: greyColor),
@@ -92,13 +100,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // --- INPUT PASSWORD ---
+                  // --- INPUT KATA SANDI ---
                   Text(
                     'Kata Sandi',
                     style: poppinsText.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _passwordController, // <-- TAMBAHAN
                     obscureText: _obscureText,
                     decoration: InputDecoration(
                       hintText: 'Masukkan kata sandi Anda',
@@ -115,7 +124,6 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: greyColor),
                       ),
-                      // Ikon Mata
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureText
@@ -147,12 +155,44 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // --- TOMBOL MASUK ---
+                  // --- TOMBOL MASUK (REVISI LOGIKA) ---
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
+                        String email = _emailController.text.trim();
+                        String password = _passwordController.text.trim();
+
+                        // 1. Validasi kalau ada field yang kosong
+                        if (email.isEmpty || password.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Email dan kata sandi tidak boleh kosong!',
+                                style: interText.copyWith(color: whiteColor),
+                              ),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          return; // Stop proses
+                        }
+
+                        // 2. Validasi harus pake @gmail.com
+                        if (!email.endsWith('@gmail.com')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Format salah!',
+                                style: interText.copyWith(color: whiteColor),
+                              ),
+                              backgroundColor: Colors.orangeAccent,
+                            ),
+                          );
+                          return; // Stop proses
+                        }
+
+                        // Jika lolos semua validasi
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -161,11 +201,9 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: secondaryColor, // Ijo muda Naventure
+                        backgroundColor: secondaryColor,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            25,
-                          ), // Bikin membulat
+                          borderRadius: BorderRadius.circular(25),
                         ),
                       ),
                       child: Text(
@@ -180,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // --- DIVIDER (Atau Login Dengan) ---
+                  // --- DIVIDER ---
                   Row(
                     children: [
                       Expanded(child: Divider(color: greyColor, thickness: 1)),
@@ -200,14 +238,11 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
 
                   // --- TOMBOL SOSMED ---
-                  // Note: Gue pake ikon bawaan (Icons) dulu buat sementara biar lo bisa langsung run.
-                  // Nanti ganti pake gambar PNG logo asli kalau aset lo udah siap.
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildSocialButton(Icons.apple, Colors.black),
                       const SizedBox(width: 20),
-                      // Google gak ada di ikon bawaan, jadi gue pinjem ikon 'G' dulu wkwk
                       _buildSocialButton(Icons.g_mobiledata, Colors.red),
                       const SizedBox(width: 20),
                       _buildSocialButton(Icons.facebook, Colors.blue),
@@ -256,7 +291,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Fungsi kecil biar gak ngoding kotak sosmed berulang-ulang
   Widget _buildSocialButton(IconData icon, Color color) {
     return Container(
       width: 50,

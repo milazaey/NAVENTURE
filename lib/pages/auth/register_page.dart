@@ -10,8 +10,24 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // --- TAMBAHAN: Controller buat halaman Register ---
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           // 1. Ornamen Lingkaran Hijau di Kiri Atas
           Positioned(
-            top: -80, // Sesuaikan lagi biar pas sama prototype
+            top: -80,
             left: -80,
             child: Container(
               width: 300,
@@ -29,17 +45,12 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter, // Mulai dari atas
-                  end: Alignment.bottomCenter, // Arah ke bawah
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
-                    secondaryColor.withValues(
-                      alpha: 1.0,
-                    ), // 100% Opacity (Pekat)
-                    secondaryColor.withValues(alpha: 0.0), // 0% Opacity (Ilang)
+                    secondaryColor.withValues(alpha: 1.0),
+                    secondaryColor.withValues(alpha: 0.0),
                   ],
-                  // --- INI KUNCI BIAR "TAJEM" ---
-                  // 0.0 artinya warna pekat mulai di paling atas
-                  // 0.5 artinya di tengah-tengah lingkaran warnanya udah lunas jadi transparan
                   stops: const [0.0, 1],
                 ),
               ),
@@ -52,11 +63,10 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tombol Back di pojok kiri atas
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context); // Balik ke halaman Login
+                      Navigator.pop(context);
                     },
                     child: Icon(Icons.arrow_back, color: blackColor),
                   ),
@@ -80,6 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _fullNameController, // <-- TAMBAHAN
                     decoration: InputDecoration(
                       hintText: 'Masukkan nama lengkap Anda',
                       hintStyle: interText.copyWith(color: greyColor),
@@ -106,6 +117,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _emailController, // <-- TAMBAHAN
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Masukkan email Anda',
                       hintStyle: interText.copyWith(color: greyColor),
@@ -132,6 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _passwordController, // <-- TAMBAHAN
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       hintText: 'Buat kata sandi',
@@ -172,6 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _confirmPasswordController, // <-- TAMBAHAN
                     obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
                       hintText: 'Ulangi kata sandi',
@@ -205,12 +220,64 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 40),
 
-                  // --- TOMBOL DAFTAR ---
+                  // --- TOMBOL DAFTAR (REVISI LOGIKA) ---
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
+                        String name = _fullNameController.text.trim();
+                        String email = _emailController.text.trim();
+                        String password = _passwordController.text.trim();
+                        String confirmPassword = _confirmPasswordController.text
+                            .trim();
+
+                        // 1. Validasi kalau ada field yang kosong
+                        if (name.isEmpty ||
+                            email.isEmpty ||
+                            password.isEmpty ||
+                            confirmPassword.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Semua kolom pendaftaran wajib diisi ya!',
+                                style: interText.copyWith(color: whiteColor),
+                              ),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // 2. Validasi format @gmail.com
+                        if (!email.endsWith('@gmail.com')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Format salah!',
+                                style: interText.copyWith(color: whiteColor),
+                              ),
+                              backgroundColor: Colors.orangeAccent,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // 3. Validasi kata sandi cocok atau enggak
+                        if (password != confirmPassword) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Waduh, kata sandi konfirmasi lo gak cocok boi!',
+                                style: interText.copyWith(color: whiteColor),
+                              ),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Jika lolos semua validasi
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -249,7 +316,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pop(context); // Balik ke halaman login
+                          Navigator.pop(context);
                         },
                         child: Text(
                           'Masuk',

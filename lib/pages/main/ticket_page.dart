@@ -171,10 +171,6 @@ class TicketPage extends StatelessWidget {
                           subTextColor,
                         ),
                         _buildTicketInfo(
-                          'Tiket Anak-anak: x${ticket.childCount}',
-                          subTextColor,
-                        ),
-                        _buildTicketInfo(
                           'Parkir (Motor): x${ticket.motorCount}',
                           subTextColor,
                         ),
