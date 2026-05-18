@@ -84,6 +84,43 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // 4. Fungsi baru buat nampilin Popup Info Lonceng/Notifikasi
+  void _showNotificationPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Notifikasi',
+            style: poppinsText.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          content: Text(
+            'Belum ada info terbaru',
+            style: interText.copyWith(color: greyColor, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Oke',
+                style: poppinsText.copyWith(
+                  color: blackColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,7 +150,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.black,
                 size: 20,
               ),
-              onPressed: () {},
+              // --- DISINI KUNCINYA BOI, KITA PANGGIL FUNGSI BARUNYA ---
+              onPressed: _showNotificationPopup,
             ),
           ),
         ],
@@ -343,7 +381,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // --- HELPER ORNAMEN GRADIENT (Tadi typo di sini boi) ---
+  // --- HELPER ORNAMEN GRADIENT ---
   Widget _buildBackgroundOrnament({
     double? top,
     double? right,
@@ -365,7 +403,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const Color(0xFF4CAF50).withValues(alpha: 0.1),
               const Color(0xFF4CAF50).withValues(alpha: 0),
             ],
-          ), // <-- Tadi gue nulisnya '],' makanya error. Sekarang udah bener pake '),'
+          ),
         ),
       ),
     );
