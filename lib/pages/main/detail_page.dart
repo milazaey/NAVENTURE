@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../models/wisata_model.dart';
 import 'booking_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatefulWidget {
   final Wisata wisata;
@@ -13,6 +14,25 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  // 🔥 BARU: FUNGSI PEMICU GOOGLE MAPS DI SINI BOI!
+  // Taruh di dalam State, persis di atas Widget build
+  Future<void> _openGoogleMaps(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (await canLaunchUrl(url)) {
+      // Memaksa sistem HP buat buka aplikasi Google Maps eksternal
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      // Jaga-jaga kalau HP user gak ada Maps atau link-nya bermasalah
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal membuka peta, boi! Cek linknya lagi.'),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +40,6 @@ class _DetailPageState extends State<DetailPage> {
       body: Stack(
         children: [
           // --- ORNAMEN BACKGROUND (Layer Paling Bawah) ---
-          // Kita taruh di area bawah gambar biar deskripsinya makin cakep
           _buildBackgroundOrnament(top: 400, left: -100),
           _buildBackgroundOrnament(bottom: 100, right: -80),
 
@@ -74,7 +93,6 @@ class _DetailPageState extends State<DetailPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // 1. Bungkus kolom kiri pake Expanded biar gak maruk makan tempat
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -83,7 +101,6 @@ class _DetailPageState extends State<DetailPage> {
                                     children: [
                                       Text(
                                         widget.wisata.name,
-                                        // 2. Kasih limit baris & ellipsis biar kalo kepanjangan jadi "..."
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: poppinsText.copyWith(
@@ -101,7 +118,6 @@ class _DetailPageState extends State<DetailPage> {
                                             size: 14,
                                           ),
                                           const SizedBox(width: 4),
-                                          // 3. Lokasi juga bungkus pake Expanded/Flexible kalo takut overflow lagi
                                           Expanded(
                                             child: Text(
                                               widget.wisata.location,
@@ -169,9 +185,8 @@ class _DetailPageState extends State<DetailPage> {
                       Row(
                         children: [
                           _buildInfoChip(
-                            Icons
-                                .location_on_outlined, // Ikon diganti jadi pin lokasi/map biar nyambung sama jarak
-                            '± ${widget.wisata.distance} dari alun-alun', // Mangggil data jarak secara dinamis
+                            Icons.location_on_outlined,
+                            '± ${widget.wisata.distance} dari alun-alun',
                           ),
                         ],
                       ),
@@ -179,11 +194,8 @@ class _DetailPageState extends State<DetailPage> {
                       Row(
                         children: [
                           _buildInfoChip(
-                            Icons
-                                .access_time_rounded, // Kita balikin jadi ikon jam bulat biar estetik
-                            widget
-                                .wisata
-                                .openHours, // <--- NOTE: Sesuaikan openHours dengan nama properti di wisata_model.dart lu (misal: openHours, jamOperasional, atau operationalHours)
+                            Icons.access_time_rounded,
+                            widget.wisata.openHours,
                           ),
                           const SizedBox(width: 12),
                           _buildInfoChip(
@@ -192,9 +204,44 @@ class _DetailPageState extends State<DetailPage> {
                           ),
                         ],
                       ),
+
+                      // 🔥 BARU: TOMBOL PETUNJUK RUTE GOOGLE MAPS
+                      // Kita taruh di bawah info chips, sebelum teks deskripsi biar eye-catching!
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: Color(0xFF2C2C2C),
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          // Pas dipencet, dia manggil fungsi _openGoogleMaps di atas sambil ngirim datanya boi
+                          onPressed: () =>
+                              _openGoogleMaps(widget.wisata.mapsUrl),
+                          icon: const Icon(
+                            Icons.map_outlined,
+                            color: Color(0xFF2C2C2C),
+                          ),
+                          label: Text(
+                            'Lihat Rute di Google Maps',
+                            style: poppinsText.copyWith(
+                              color: const Color(0xFF2C2C2C),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: 20),
                       Text(
-                        widget.wisata.description, // <--- INI KUNCINYA BOI!
+                        widget.wisata.description,
                         style: interText.copyWith(
                           color: greyColor,
                           fontSize: 14,
@@ -283,7 +330,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // --- FUNGSI HELPER ORNAMEN (Sama kaya di Home) ---
+  // --- FUNGSI HELPER ORNAMEN ---
   Widget _buildBackgroundOrnament({
     double? top,
     double? right,
