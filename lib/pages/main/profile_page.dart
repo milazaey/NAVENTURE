@@ -5,8 +5,8 @@ import '../../utils/theme.dart';
 import 'favorite_page.dart';
 import 'ticket_page.dart';
 import 'emergency_page.dart';
-import 'dart:io'; // Tambahin ini buat baca file gambar
-import 'package:image_picker/image_picker.dart'; // Tambahin ini buat galeri
+import 'dart:io'; // Amankan pembacaan file gambar
+import 'package:image_picker/image_picker.dart'; // Amankan akses galeri
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,12 +16,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // 1. Siapkan Variabel Penampung
+  // --- 1. LOGIKA VARIABEL STATE (TETAP AMAN) ---
   String userName = 'Maki Zenin';
   String userEmail = 'zenin_makin@email.com';
-  File? _imageFile; // Buat nyimpen gambar dari galeri
+  File? _imageFile;
 
-  // 2. Fungsi buat ngambil gambar dari galeri
+  // --- 2. FUNGSI PICK IMAGE DARI GALERI ---
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(
@@ -35,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // 3. Fungsi buat nampilin Popup Edit Nama & Email
+  // --- 3. FUNGSI EDIT POPUP NAMA & EMAIL ---
   void _showEditPopup() {
     TextEditingController nameController = TextEditingController(
       text: userName,
@@ -48,35 +48,63 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Profil'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Edit Profil',
+            style: poppinsText.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nama'),
+                decoration: const InputDecoration(
+                  labelText: 'Nama',
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF2E7D32)),
+                  ),
+                ),
               ),
+              const SizedBox(height: 12),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF2E7D32)),
+                  ),
+                ),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Batal
-              child: const Text('Batal'),
+              onPressed: () => Navigator.pop(context),
+              child: Text('Batal', style: interText.copyWith(color: greyColor)),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2E7D32),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () {
-                // Simpan perubahan dan refresh layar (setState)
                 setState(() {
                   userName = nameController.text;
                   userEmail = emailController.text;
                 });
-                Navigator.pop(context); // Tutup popup
+                Navigator.pop(context);
               },
-              child: const Text('Simpan'),
+              child: Text(
+                'Simpan',
+                style: interText.copyWith(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -84,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // 4. Fungsi baru buat nampilin Popup Info Lonceng/Notifikasi
+  // --- 4. FUNGSI NOTIFIKASI POPUP ---
   void _showNotificationPopup() {
     showDialog(
       context: context,
@@ -110,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text(
                 'Oke',
                 style: poppinsText.copyWith(
-                  color: blackColor,
+                  color: const Color(0xFF2E7D32),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -123,217 +151,252 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Profil',
-          style: poppinsText.copyWith(
-            color: blackColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+    return Container(
+      // --- BACKGROUND GRADASI ALAM (SERAGAM DAN KONSISTEN) ---
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFE8F5E9), // Hijau mint
+            Color(0xFFF1F8E9), // Hijau kekuningan
+            Color(0xFFE0F2F1), // Soft cyan
+            Colors.white,
+          ],
+          stops: [0.0, 0.4, 0.7, 1.0],
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: Colors.black,
-                size: 20,
-              ),
-              // --- DISINI KUNCINYA BOI, KITA PANGGIL FUNGSI BARUNYA ---
-              onPressed: _showNotificationPopup,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent, // Tembus ke gradasi background
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            'Profil',
+            style: poppinsText.copyWith(
+              color: blackColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
             ),
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // --- ORNAMEN GRADIENT (KIRI ATAS & KANAN BAWAH) ---
-          _buildBackgroundOrnament(top: -50, left: -100),
-          _buildBackgroundOrnament(bottom: 0, right: -120),
-
-          // --- KONTEN UTAMA ---
-          ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            children: [
-              // 1. FOTO PROFIL & NAMA
-              Center(
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        // --- BAGIAN FOTO ---
-                        GestureDetector(
-                          onTap: _pickImage, // Kalo foto diklik, buka galeri
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              // Cek apakah ada file gambar baru? Kalo gak ada, pake asset bawaan
-                              image: DecorationImage(
-                                image: _imageFile != null
-                                    ? FileImage(_imageFile!)
-                                          as ImageProvider // <--- Pake foto dari galeri (File)
-                                    : const AssetImage(
-                                        'assets/img/profile.jpg',
-                                      ), // <--- Pake foto bawaan (Asset)
-                                fit: BoxFit.cover,
-                              ),
-                              border: Border.all(color: Colors.white, width: 3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // --- BAGIAN ICON PENSIL ---
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap:
-                                _showEditPopup, // Kalo pensil diklik, buka popup edit nama/email
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.edit,
-                                size: 14,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // --- NAMA (Pake Variabel) ---
-                    Text(
-                      userName,
-                      style: poppinsText.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: blackColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // --- EMAIL (Pake Variabel) ---
-                    Text(
-                      userEmail,
-                      style: interText.copyWith(fontSize: 14, color: greyColor),
-                    ),
-                  ],
-                ),
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 20),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey.shade300),
               ),
-              const SizedBox(height: 40),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.notifications_none,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                onPressed: _showNotificationPopup,
+              ),
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            // --- ORNAMEN MESH MAKSIMAL ---
+            _buildBackgroundOrnament(
+              top: -50,
+              left: -50,
+              size: 280,
+              color: const Color(0xFF81C784),
+            ),
+            _buildBackgroundOrnament(
+              bottom: 50,
+              right: -100,
+              size: 350,
+              color: const Color(0xFFAED581),
+            ),
 
-              // 2. MENU LIST
-              _buildMenuItem(
-                icon: Icons.favorite_border,
-                title: 'Favorit',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FavoritePage()),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildMenuItem(
-                icon: Icons.confirmation_number_outlined,
-                title: 'Tiket',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const TicketPage()),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildMenuItem(
-                icon: Icons.settings_outlined,
-                title: 'Pengaturan Akun & Keamanan',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AccountSecurityPage(),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildMenuItem(
-                icon: Icons.help_outline,
-                title: 'Layanan Darurat',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const EmergencyPage(),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 60),
-
-              // 3. TOMBOL LOGOUT
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                    (route) => false,
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.red.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            // --- KONTEN LIST ---
+            ListView(
+              // Padding bawah dikasih 100 biar aman dari tabrakan navbar custom boi
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
+              children: [
+                // 1. BLOK FOTO PROFIL & IDENTITAS
+                Center(
+                  child: Column(
                     children: [
+                      Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              width: 104,
+                              height: 104,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                                image: DecorationImage(
+                                  image: _imageFile != null
+                                      ? FileImage(_imageFile!) as ImageProvider
+                                      : const AssetImage(
+                                          'assets/img/profile.jpg',
+                                        ),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 2,
+                            right: 2,
+                            child: GestureDetector(
+                              onTap: _showEditPopup,
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: const BoxDecoration(
+                                  color: Color(
+                                    0xFF2E7D32,
+                                  ), // Ubah jadi hijau biar estetik boi
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                       Text(
-                        'Keluar',
+                        userName,
                         style: poppinsText.copyWith(
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: blackColor,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.logout,
-                        color: Colors.redAccent,
-                        size: 20,
+                      const SizedBox(height: 4),
+                      Text(
+                        userEmail,
+                        style: interText.copyWith(
+                          fontSize: 14,
+                          color: greyColor,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(height: 36),
+
+                // 2. KELOMPOK MENU UTAMA
+                _buildMenuItem(
+                  icon: Icons.favorite_border,
+                  title: 'Favorit',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FavoritePage(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  icon: Icons.confirmation_number_outlined,
+                  title: 'Tiket',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const TicketPage()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  icon: Icons.settings_outlined,
+                  title: 'Pengaturan Akun & Keamanan',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AccountSecurityPage(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  icon: Icons.help_outline,
+                  title: 'Layanan Darurat',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EmergencyPage(),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 48),
+
+                // 3. SEKTOR TOMBOL LOGOUT PREMIUM
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Colors.red.withValues(alpha: 0.15),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withValues(alpha: 0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Keluar',
+                          style: poppinsText.copyWith(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.logout,
+                          color: Colors.redAccent,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -350,11 +413,11 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade100),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -362,7 +425,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.black87, size: 22),
+            Icon(
+              icon,
+              color: const Color(0xFF2E7D32),
+              size: 22,
+            ), // Warna ikon diselaraskan ke hijau tema
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -374,19 +441,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.black54, size: 20),
+            const Icon(Icons.chevron_right, color: Colors.black38, size: 20),
           ],
         ),
       ),
     );
   }
 
-  // --- HELPER ORNAMEN GRADIENT ---
+  // --- HELPER ORNAMEN GRADIENT REUSABLE ---
   Widget _buildBackgroundOrnament({
     double? top,
     double? right,
     double? left,
     double? bottom,
+    required double size,
+    required Color color,
   }) {
     return Positioned(
       top: top,
@@ -394,15 +463,17 @@ class _ProfilePageState extends State<ProfilePage> {
       left: left,
       bottom: bottom,
       child: Container(
-        width: 320,
-        height: 320,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              const Color(0xFF4CAF50).withValues(alpha: 0.1),
-              const Color(0xFF4CAF50).withValues(alpha: 0),
+              color.withValues(alpha: 0.1),
+              color.withValues(alpha: 0.1),
+              color.withValues(alpha: 0.0),
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
       ),

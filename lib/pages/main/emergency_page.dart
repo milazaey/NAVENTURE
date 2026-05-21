@@ -8,52 +8,79 @@ class EmergencyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFAFAFA),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            'Emergency',
-            style: poppinsText.copyWith(
-              color: blackColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
-          ),
-          bottom: TabBar(
-            indicatorColor: blackColor,
-            indicatorWeight: 3,
-            labelColor: blackColor,
-            unselectedLabelColor: greyColor,
-            labelStyle: poppinsText.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-            tabs: const [
-              Tab(text: 'Layanan Darurat'),
-              Tab(text: 'Kontak Lokal'),
+      child: Container(
+        // --- 1. BACKGROUND ALAM BIAR KONSISTEN ---
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFE8F5E9), // Hijau mint
+              Color(0xFFF1F8E9), // Hijau kekuningan
+              Color(0xFFE0F2F1), // Soft cyan
+              Colors.white,
             ],
+            stops: [0.0, 0.4, 0.7, 1.0],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // Tab 1 dengan Ornamen
-            Stack(
-              children: [
-                _buildBackgroundOrnament(top: -50, right: -100),
-                _buildLayananDaruratTab(),
+        child: Scaffold(
+          backgroundColor:
+              Colors.transparent, // Wajib transparan biar gradasi nyala
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
+            title: Text(
+              'Emergency',
+              style: poppinsText.copyWith(
+                color: blackColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            bottom: TabBar(
+              indicatorColor: const Color(0xFF2E7D32), // Aksen hijau segar
+              indicatorWeight: 3,
+              labelColor: const Color(0xFF2E7D32),
+              unselectedLabelColor: greyColor,
+              labelStyle: poppinsText.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              tabs: const [
+                Tab(text: 'Layanan Darurat'),
+                Tab(text: 'Kontak Lokal'),
               ],
             ),
-            // Tab 2 dengan Ornamen
-            Stack(
-              children: [
-                _buildBackgroundOrnament(bottom: 50, left: -100),
-                _buildKontakLokalTab(),
-              ],
-            ),
-          ],
+          ),
+          body: TabBarView(
+            children: [
+              // Tab 1 dengan Ornamen
+              Stack(
+                children: [
+                  _buildBackgroundOrnament(
+                    top: -50,
+                    right: -50,
+                    size: 280,
+                    color: const Color(0xFF81C784),
+                  ),
+                  _buildLayananDaruratTab(),
+                ],
+              ),
+              // Tab 2 dengan Ornamen
+              Stack(
+                children: [
+                  _buildBackgroundOrnament(
+                    bottom: 100,
+                    left: -150,
+                    size: 350,
+                    color: const Color(0xFFAED581),
+                  ),
+                  _buildKontakLokalTab(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -62,16 +89,19 @@ class EmergencyPage extends StatelessWidget {
   // --- WIDGET TAB 1 ---
   Widget _buildLayananDaruratTab() {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      // Padding bawah dilebihin (100) biar ga ketabrak navbar
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
       children: [
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white, // Tetap putih solid biar jelas pas darurat
+            borderRadius: BorderRadius.circular(
+              20,
+            ), // Border dilengkungin dikit biar modern
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: 0.08), // Shadow dihalusin
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               ),
@@ -86,18 +116,22 @@ class EmergencyPage extends StatelessWidget {
                   Text(
                     '112',
                     style: poppinsText.copyWith(
-                      fontSize: 40,
+                      fontSize: 44, // Digedein dikit biar makin jelas
                       fontWeight: FontWeight.bold,
                       color: blackColor,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.red.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.phone_forwarded, color: Colors.red),
+                    child: const Icon(
+                      Icons.phone_forwarded,
+                      color: Colors.red,
+                      size: 28,
+                    ),
                   ),
                 ],
               ),
@@ -105,7 +139,7 @@ class EmergencyPage extends StatelessWidget {
               Divider(color: Colors.grey.shade200, thickness: 1.5),
               const SizedBox(height: 16),
               Text(
-                'Layanan Darurat integrasi Kepolisian, Pemadam Kebakaran, Ambulans/Medis, serta Badan Penanggulangan Bencana Daerah (BPBD)',
+                'Layanan Darurat terintegrasi Kepolisian, Pemadam Kebakaran, Ambulans/Medis, serta Badan Penanggulangan Bencana Daerah (BPBD).',
                 style: interText.copyWith(
                   color: blackColor.withValues(alpha: 0.7),
                   fontSize: 13,
@@ -122,7 +156,7 @@ class EmergencyPage extends StatelessWidget {
   // --- WIDGET TAB 2 ---
   Widget _buildKontakLokalTab() {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
       children: [
         _buildContactCard('Aris Budiman', '+6285900156734'),
         const SizedBox(height: 16),
@@ -170,12 +204,14 @@ class EmergencyPage extends StatelessWidget {
             ],
           ),
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2C2C2C).withValues(alpha: 0.05),
+              color: const Color(
+                0xFF2E7D32,
+              ).withValues(alpha: 0.1), // Ubah jadi hijau tema
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.call, color: Color(0xFF2C2C2C), size: 22),
+            child: const Icon(Icons.call, color: Color(0xFF2E7D32), size: 22),
           ),
         ],
       ),
@@ -188,6 +224,8 @@ class EmergencyPage extends StatelessWidget {
     double? right,
     double? left,
     double? bottom,
+    required double size,
+    required Color color,
   }) {
     return Positioned(
       top: top,
@@ -195,15 +233,17 @@ class EmergencyPage extends StatelessWidget {
       left: left,
       bottom: bottom,
       child: Container(
-        width: 300,
-        height: 300,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              const Color(0xFF4CAF50).withValues(alpha: 0.17),
-              const Color(0xFF4CAF50).withValues(alpha: 0),
+              color.withValues(alpha: 0.35),
+              color.withValues(alpha: 0.15),
+              color.withValues(alpha: 0.0),
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
       ),

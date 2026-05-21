@@ -13,38 +13,47 @@ class FilterPage extends StatefulWidget {
 }
 
 class _FilterPageState extends State<FilterPage> {
-  // Kita siapin list buat nampung hasil filter
-  List<Wisata> displayedWisata = [];
+  // Kontroler teks buat mantau isi input dan memicu tombol hapus otomatis
+  final TextEditingController _searchController = TextEditingController();
 
-  // List asli berdasarkan kategori (buat patokan search)
+  List<Wisata> displayedWisata = [];
   List<Wisata> categoryWisata = [];
 
   @override
   void initState() {
     super.initState();
-    // 1. Filter dulu berdasarkan kategori pas halaman dibuka
+    // 1. Amankan penyaringan kategori dengan pembersihan spasi & karakter newline (\n)
+    final targetCategory = widget.categoryName
+        .toLowerCase()
+        .replaceAll('\n', ' ')
+        .trim();
+
     categoryWisata = mockWisata.where((w) {
-      // Kita cek apakah ada SALAH SATU isi di dalam list category
-      // yang cocok dengan categoryName dari halaman sebelumnya
       return w.category.any(
-        (cat) =>
-            cat.toLowerCase() ==
-            widget.categoryName.toLowerCase().replaceAll('\n', ' '),
+        (cat) => cat.toLowerCase().trim() == targetCategory,
       );
     }).toList();
 
-    // 2. Set tampilan awal sama dengan hasil filter kategori
+    // 2. Tampilan awal disamakan dengan cetakan kategori asal
     displayedWisata = categoryWisata;
   }
 
-  // --- LOGIKA SEARCH ---
+  @override
+  void dispose() {
+    _searchController.dispose(); // Wajib didispose biar gak bocor memorinya boi
+    super.dispose();
+  }
+
+  // --- LOGIKA EMAS: PENCARIAN DI DALAM KATEGORI TERKUNCI ---
   void _onSearchChanged(String query) {
     setState(() {
-      if (query.isEmpty) {
+      if (query.trim().isEmpty) {
         displayedWisata = categoryWisata;
       } else {
         displayedWisata = categoryWisata
-            .where((w) => w.name.toLowerCase().contains(query.toLowerCase()))
+            .where(
+              (w) => w.name.toLowerCase().contains(query.toLowerCase().trim()),
+            )
             .toList();
       }
     });
@@ -53,178 +62,234 @@ class _FilterPageState extends State<FilterPage> {
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase().trim()) {
       case 'dataran tinggi':
-        return Icons.terrain;
+      case 'gunung':
+        return Icons.terrain_rounded;
       case 'air terjun':
-        return Icons.water_drop;
+      case 'wisata air':
+        return Icons.water_drop_rounded;
       case 'situs sejarah':
-        return Icons.history_edu;
+      case 'budaya':
+        return Icons.account_balance_rounded;
       case 'agrowisata':
-        return Icons.eco;
+      case 'alam':
+        return Icons.eco_rounded;
+      case 'pantai':
+        return Icons.beach_access_rounded;
       default:
-        return Icons.eco;
+        return Icons.explore_rounded;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          _buildBackgroundOrnament(top: -50, right: -100),
-          _buildBackgroundOrnament(bottom: 150, left: -130),
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // --- ONE ROW TOP BAR (Back + Logo + Search Bar) ---
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    24,
-                    20,
-                    24,
-                    10,
-                  ), // Kasih space atas dikit biar lega boi
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 1. Tombol Back di paling kiri boi
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 4,
-                            ), // Biar center vertikal sama logo bulat
-                            child: GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.grey.shade100,
-                                child: const Icon(
-                                  Icons.arrow_back_ios_new,
-                                  size: 18,
-                                  color: Colors.black,
+    final cleanCategoryName = widget.categoryName.replaceAll('\n', ' ').trim();
+
+    return Container(
+      // --- BACKGROUND GRADASI SEGAR ---
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFE8F5E9), // Soft Mint Hijau
+            Colors.white,
+          ],
+          stops: [0.0, 0.25],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            // Ornamen estetik background pembentuk vibe premium
+            _buildBackgroundOrnament(
+              top: -40,
+              right: -80,
+              size: 240,
+              color: const Color(0xFF81C784),
+            ),
+            _buildBackgroundOrnament(
+              bottom: 100,
+              left: -100,
+              size: 280,
+              color: const Color(0xFFAED581),
+            ),
+
+            SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- 1. KOMPONEN HEADER: ROW ATAS (BACK + SEARCH BAR) ---
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                    child: Row(
+                      children: [
+                        // Tombol Back Elegan Lingkaran Putih
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            height: 44,
+                            width: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
                                 ),
-                              ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 16,
+                              color: Color(0xFF2C2C2C),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                        ),
+                        const SizedBox(width: 12),
+                        // Search Bar Proporsional (Mengisi Sisa Row Luas)
+                        Expanded(child: _buildSearchBar(cleanCategoryName)),
+                      ],
+                    ),
+                  ),
 
-                          // 2. Logo Kategori & Teks di bawahnya (di tengah-tengah)
-                          Column(
+                  // --- 2. INFORMASI BADGE KATEGORI & JUDUL HALAMAN ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Badge Penunjuk Kategori Aktif
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E7D32), // Hijau Alam Utama
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  _getCategoryIcon(widget.categoryName),
-                                  color: Colors.black,
-                                ),
+                              Icon(
+                                _getCategoryIcon(cleanCategoryName),
+                                size: 14,
+                                color: Colors.white,
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                widget.categoryName.replaceAll('\n', ' '),
+                                cleanCategoryName,
                                 style: interText.copyWith(
-                                  color: greyColor,
-                                  fontSize:
-                                      12, // Dikecilin dikit biar makin proporsional
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(width: 12),
-
-                          // 3. Search bar di paling kanan
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                top: 2,
-                              ), // Biar center vertikal juga
-                              child: _buildSearchBar(_onSearchChanged),
-                            ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Judul Utama Pemikat Eksplorasi
+                        Text(
+                          'Hidden Gems Pilihan',
+                          style: poppinsText.copyWith(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: blackColor,
+                            height: 1.2,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Judul ala Prototype
-                      Text(
-                        'Hidden gems ${widget.categoryName.toLowerCase().replaceAll('\n', ' ')}',
-                        style: poppinsText.copyWith(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: blackColor,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // --- GRID WISATA ---
-                Expanded(
-                  child: displayedWisata.isEmpty
-                      ? _buildEmptyState()
-                      : GridView.builder(
-                          padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                childAspectRatio: 0.75,
-                              ),
-                          itemCount: displayedWisata.length,
-                          itemBuilder: (context, index) =>
-                              _buildGridCard(context, displayedWisata[index]),
-                        ),
-                ),
-              ],
+                  // --- 3. SEKTOR UTAMA: GRID VIEW HASIL FILTER ---
+                  Expanded(
+                    child: displayedWisata.isEmpty
+                        ? _buildEmptyState()
+                        : GridView.builder(
+                            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 16,
+                                  crossAxisSpacing: 14,
+                                  childAspectRatio:
+                                      0.74, // Aspek rasio pas buat baca teks info card
+                                ),
+                            itemCount: displayedWisata.length,
+                            itemBuilder: (context, index) =>
+                                _buildGridCard(context, displayedWisata[index]),
+                          ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // Widget Search Bar tetap utuh
-  Widget _buildSearchBar(Function(String) onChanged) {
+  // Bar Pencarian Reusable Premium Berfitur Tombol Hapus "X" Otomatis
+  Widget _buildSearchBar(String categoryPlaceholder) {
     return Container(
-      height: 45,
+      height: 46,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
+          Icon(Icons.search_rounded, color: greyColor, size: 20),
+          const SizedBox(width: 8),
           Expanded(
             child: TextField(
-              onChanged: onChanged,
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              style: interText.copyWith(color: blackColor, fontSize: 13),
               decoration: InputDecoration(
-                hintText:
-                    'Cari di ${widget.categoryName.replaceAll('\n', ' ')}...',
-                hintStyle: interText.copyWith(color: greyColor, fontSize: 13),
+                hintText: 'Cari destinasi...',
+                hintStyle: interText.copyWith(
+                  color: greyColor.withValues(alpha: 0.7),
+                  fontSize: 13,
+                ),
                 border: InputBorder.none,
+                isDense: true,
               ),
             ),
           ),
-          Icon(Icons.search, color: greyColor, size: 20),
+          // Tombol X penghapus teks instan, muncul cuma kalau ada ketikan boi
+          if (_searchController.text.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                _searchController.clear();
+                _onSearchChanged('');
+              },
+              child: Icon(Icons.close_rounded, color: greyColor, size: 18),
+            ),
         ],
       ),
     );
   }
 
-  // --- REUSABLE UI COMPONENTS ---
+  // --- KARTU GRID PREMIUM DENGAN FITUR FAVORIT MANDIRI ---
   Widget _buildGridCard(BuildContext context, Wisata wisata) {
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -234,6 +299,13 @@ class _FilterPageState extends State<FilterPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
           image: DecorationImage(
             image: AssetImage(wisata.imageUrl),
             fit: BoxFit.cover,
@@ -241,32 +313,60 @@ class _FilterPageState extends State<FilterPage> {
         ),
         child: Stack(
           children: [
-            Positioned(
-              top: 10,
-              right: 10,
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.black.withValues(alpha: 0.3),
-                child: Icon(
-                  wisata.isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: wisata.isFavorite ? Colors.red : Colors.white,
-                  size: 16,
-                ),
-              ),
-            ),
+            // Layer Penutup Gradasi Gelap di Bawah Gambar Biar Teks Terbaca Jelas
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
+                height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(24),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.75),
+                    ],
+                  ),
                 ),
+              ),
+            ),
+            // TOMBOL FAVORIT INDEPENDEN (Sudah Diperbaiki Logikanya 🔥)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    wisata.isFavorite = !wisata.isFavorite;
+                  });
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    wisata.isFavorite
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    color: wisata.isFavorite
+                        ? Colors.redAccent
+                        : const Color(0xFF2C2C2C),
+                    size: 16,
+                  ),
+                ),
+              ),
+            ),
+            // Blok Konten Info Wisata (Nama, Rating, Lokasi)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,39 +375,48 @@ class _FilterPageState extends State<FilterPage> {
                       wisata.name,
                       style: poppinsText.copyWith(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: Colors.white,
-                              size: 10,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              wisata.location.split(',').last.trim(),
-                              style: interText.copyWith(
-                                color: Colors.white,
-                                fontSize: 10,
+                        // Info Detail Sektor Kab/Kota Akhir
+                        Expanded(
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_rounded,
+                                color: Colors.greenAccent,
+                                size: 12,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 2),
+                              Expanded(
+                                child: Text(
+                                  wisata.location.split(',').last.trim(),
+                                  style: interText.copyWith(
+                                    color: const Color(0xFFE0E0E0),
+                                    fontSize: 10,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 4),
+                        // Nilai Rating Bintang
                         Row(
                           children: [
                             const Icon(
-                              Icons.star,
+                              Icons.star_rounded,
                               color: Colors.amber,
-                              size: 10,
+                              size: 12,
                             ),
                             const SizedBox(width: 2),
                             Text(
@@ -315,6 +424,7 @@ class _FilterPageState extends State<FilterPage> {
                               style: interText.copyWith(
                                 color: Colors.white,
                                 fontSize: 10,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
@@ -336,15 +446,31 @@ class _FilterPageState extends State<FilterPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 60,
-            color: greyColor.withValues(alpha: 0.5),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.search_off_rounded,
+              size: 50,
+              color: greyColor.withValues(alpha: 0.6),
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
           Text(
             'Gak ada yang namanya gitu di sini boi.. 😢',
-            style: interText.copyWith(color: greyColor),
+            style: poppinsText.copyWith(
+              color: const Color(0xFF4F4F4F),
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Coba ketik kata kunci destinasi lainnya',
+            style: interText.copyWith(color: greyColor, fontSize: 12),
           ),
         ],
       ),
@@ -356,6 +482,8 @@ class _FilterPageState extends State<FilterPage> {
     double? right,
     double? left,
     double? bottom,
+    required double size,
+    required Color color,
   }) {
     return Positioned(
       top: top,
@@ -363,15 +491,17 @@ class _FilterPageState extends State<FilterPage> {
       left: left,
       bottom: bottom,
       child: Container(
-        width: 300,
-        height: 300,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              const Color(0xFF4CAF50).withValues(alpha: 0.2),
-              const Color(0xFF4CAF50).withValues(alpha: 0),
+              color.withValues(alpha: 0.18),
+              color.withValues(alpha: 0.05),
+              color.withValues(alpha: 0.0),
             ],
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
       ),
