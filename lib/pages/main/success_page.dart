@@ -182,12 +182,12 @@ class SuccessPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      // LOGIKA EMAS: Bersihkan seluruh tumpukan halaman checkout lama,
-                      // langsung buka TicketPage sebagai halaman utama baru boi!
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const TicketPage(),
+                          builder: (context) => const MainPage(
+                            initialIndex: 2,
+                          ), // <-- WAJIB 2 YAA BOI!
                         ),
                         (route) => false,
                       );

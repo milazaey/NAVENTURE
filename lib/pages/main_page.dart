@@ -8,20 +8,32 @@ import 'main/home_page.dart';
 import 'main/ticket_page.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  // 🔥 INI YANG DITAMBAHIN 1: Pintu masuk buat nerima request pindah tab
+  final int initialIndex;
+
+  // 🔥 INI YANG DITAMBAHIN 2: Default 0 (Home) kalau dibuka biasa
+  const MainPage({super.key, this.initialIndex = 0});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+  // 🔥 INI YANG DITAMBAHIN 3: Pake late biar bisa diisi pas initState
+  late int _currentIndex;
 
-  // List halaman tetep sama persis kayak punya lu
+  @override
+  void initState() {
+    super.initState();
+    // 🔥 INI YANG DITAMBAHIN 4: Tangkep data index dari halaman sebelumnya
+    _currentIndex = widget.initialIndex;
+  }
+
+  // List halaman tetep sama persis
   List<Widget> get _pages => [
     const HomePage(),
     const FavoritePage(),
-    TicketPage(),
+    const TicketPage(), // Kasih const (kalau error hapus aja const-nya)
     const EmergencyPage(),
     const ProfilePage(),
   ];
@@ -29,12 +41,12 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 1. TAMBAHIN INI: Biar background gradasi alam di HomePage tembus sampai ke bawah navbar
+      // 1. Biar background gradasi alam di HomePage tembus sampai ke bawah navbar
       extendBody: true,
       backgroundColor: whiteColor,
       body: _pages[_currentIndex],
 
-      // 2. NAVBAR DI-UPGRADE JADI FLOATING GLASSMORPHISM
+      // 2. NAVBAR FLOATING GLASSMORPHISM
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(
           left: 24,
@@ -71,8 +83,11 @@ class _MainPageState extends State<MainPage> {
               currentIndex: _currentIndex,
 
               // 3. WARNA ICON DI-UPGRADE
-              selectedItemColor: const Color(
-                0xFF2E7D32,
+              selectedItemColor: const Color.fromARGB(
+                255,
+                0,
+                0,
+                0,
               ), // Hijau tua seger buat icon aktif
               unselectedItemColor: greyColor.withValues(
                 alpha: 0.7,

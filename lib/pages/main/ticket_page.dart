@@ -9,56 +9,40 @@ class TicketPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Container(
-        // --- BACKGROUND ALAM TETEP KONSISTEN OKE ---
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFE8F5E9), // Hijau mint
-              Color(0xFFF1F8E9), // Hijau kekuningan
-              Color(0xFFE0F2F1), // Soft cyan
-              Colors.white,
+      child: Scaffold(
+        backgroundColor: Colors.white, // Murni putih kertas boi
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Text(
+            'Tiket',
+            style: poppinsText.copyWith(
+              color: blackColor,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+          bottom: TabBar(
+            indicatorColor: const Color(0xFF2E7D32),
+            indicatorWeight: 3,
+            labelColor: const Color(0xFF2E7D32),
+            unselectedLabelColor: greyColor,
+            labelStyle: poppinsText.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            tabs: const [
+              Tab(text: 'Aktif'),
+              Tab(text: 'Tidak Aktif'),
             ],
-            stops: [0.0, 0.4, 0.7, 1.0],
           ),
         ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Text(
-              'Tiket',
-              style: poppinsText.copyWith(
-                color: blackColor,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-            bottom: TabBar(
-              indicatorColor: const Color(0xFF2E7D32),
-              indicatorWeight: 3,
-              labelColor: const Color(0xFF2E7D32),
-              unselectedLabelColor: greyColor,
-              labelStyle: poppinsText.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-              tabs: const [
-                Tab(text: 'Aktif'),
-                Tab(text: 'Tidak Aktif'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              _buildTicketContent(isActive: true),
-              _buildTicketContent(isActive: false),
-            ],
-          ),
+        body: TabBarView(
+          children: [
+            _buildTicketContent(isActive: true),
+            _buildTicketContent(isActive: false),
+          ],
         ),
       ),
     );
@@ -68,6 +52,7 @@ class TicketPage extends StatelessWidget {
   Widget _buildTicketContent({required bool isActive}) {
     return Stack(
       children: [
+        // Ornamen bulat tipis disesuaikan biar pas di latar putih
         _buildBackgroundOrnament(
           top: -50,
           right: -50,
@@ -109,9 +94,8 @@ class TicketPage extends StatelessWidget {
     );
   }
 
-  // --- KARTU TIKET BARU (KLONINGAN image_72306c.png) ---
+  // --- KARTU TIKET BARU ---
   Widget _buildTicketCard(Ticket ticket) {
-    // Sesuai gambar: Aktif ijo subur, tidak aktif abu-abu mati
     Color cardColor = ticket.isActive
         ? const Color(0xFF388E3C)
         : Colors.grey.shade600;
@@ -121,8 +105,7 @@ class TicketPage extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      height:
-          195, // Tinggi ideal biar list text muat rapi gausah mencet-mencet boi
+      height: 195,
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -144,13 +127,11 @@ class TicketPage extends StatelessWidget {
               child: Icon(
                 Icons.qr_code_2,
                 size: 85,
-                color: Colors.black.withValues(
-                  alpha: 0.85,
-                ), // Hitam pekat kontras tinggi
+                color: Colors.black.withValues(alpha: 0.85),
               ),
             ),
 
-            // 2. TENGAH: DETAIL INFORMASI (TEXT FULL PUTIH)
+            // 2. TENGAH: DETAIL INFORMASI
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -199,7 +180,7 @@ class TicketPage extends StatelessWidget {
                       textColor,
                     ),
                     _buildTicketInfo(
-                      'Sewa tour Guide Lokal x${ticket.guideCount}',
+                      'Sewa Tour Guide Lokal x${ticket.guideCount}',
                       textColor,
                     ),
                   ],
@@ -211,8 +192,7 @@ class TicketPage extends StatelessWidget {
             SizedBox(
               width: 24,
               child: Stack(
-                clipBehavior:
-                    Clip.none, // Biar bulatan punch hole bebas keluar batas box
+                clipBehavior: Clip.none,
                 children: [
                   // Garis Putus-Putus Tengah
                   LayoutBuilder(
@@ -235,7 +215,7 @@ class TicketPage extends StatelessWidget {
                       );
                     },
                   ),
-                  // Lubang Guntingan Atas
+                  // Lubang Guntingan Atas (Sekarang nyatu sempurna karena background-nya putih)
                   Positioned(
                     top: -14,
                     left: -2,
@@ -243,7 +223,7 @@ class TicketPage extends StatelessWidget {
                       width: 28,
                       height: 28,
                       decoration: const BoxDecoration(
-                        color: Colors.white, // Lingkaran putih pemotong ijo
+                        color: Colors.white,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -316,11 +296,11 @@ class TicketPage extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.35),
-              color.withValues(alpha: 0.15),
+              color.withValues(alpha: 0.40),
+              color.withValues(alpha: 0.05),
               color.withValues(alpha: 0.0),
             ],
-            stops: const [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
       ),

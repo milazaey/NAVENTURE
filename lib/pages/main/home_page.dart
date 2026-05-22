@@ -124,25 +124,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Murni putih kertas
       body: Container(
-        // --- 1. BACKGROUND GRADASI ALAM ---
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFE8F5E9), // Hijau mint (Vibe Daun)
-              Color(0xFFF1F8E9), // Hijau kekuningan (Sinar Matahari Pagi)
-              Color(0xFFE0F2F1), // Soft cyan (Vibe Air/Langit)
-              Colors.white,
-            ],
-            stops: [0.0, 0.4, 0.7, 1.0],
-          ),
-        ),
+        // --- 1. BACKGROUND PUTIH BERSIH ---
+        color: Colors.white, // Gak ada lagi LinearGradient
         child: SafeArea(
           child: Stack(
             children: [
               // --- 2. ORNAMEN BULAT ALAM (Background Mesh) ---
+              // Posisi disebar biar glow-nya merata di kanvas putih
               _buildBackgroundOrnament(
                 top: -50,
                 left: -50,
@@ -360,7 +350,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ===========================================================================
-  // FUNGSI HELPER (ALAT MASAK) - GW COMPACT KAN SEMUA DI SINI BIAR GAK ERROR
+  // FUNGSI HELPER (ALAT MASAK)
   // ===========================================================================
 
   Widget _buildBackgroundOrnament({
@@ -383,11 +373,14 @@ class _HomePageState extends State<HomePage> {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.35),
-              color.withValues(alpha: 0.15),
+              // Core warna tengah cuma 12% pekat (tipis banget)
+              color.withValues(alpha: 0.17),
+              // Luar tengah makin pudar 3%
+              color.withValues(alpha: 0.03),
+              // Ujung bulatan hilang total biar nge-blend halus
               color.withValues(alpha: 0.0),
             ],
-            stops: const [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.6, 1.0], // Sync dengan style sebelumnya
           ),
         ),
       ),
@@ -453,10 +446,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) =>
-                DetailPage(wisata), // <--- FIX: Parameter posisi, bukan named!
-          ),
+          MaterialPageRoute(builder: (context) => DetailPage(wisata)),
         );
       },
       child: Container(

@@ -1,3 +1,4 @@
+import 'dart:ui'; // WAJIB BUAT EFEK BLUR KACA
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../models/wisata_model.dart';
@@ -14,7 +15,7 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  // --- LOGIKA EMAS: PEMICU GOOGLE MAPS EKSTERNAL (TETAP AMAN) ---
+  // --- 🧠 LOGIKA GOOGLE MAPS EKSTERNAL (AMAN TERSIMPAN) ---
   Future<void> _openGoogleMaps(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (await canLaunchUrl(url)) {
@@ -32,59 +33,39 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // --- BACKGROUND GRADASI ALAM PREMIUM ---
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFE8F5E9), // Hijau mint super soft
-            Color(0xFFF1F8E9), // Hijau kekuningan cerah
-            Colors.white,
-          ],
-          stops: [0.0, 0.4, 1.0],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor:
-            Colors.transparent, // Tembus ke gradasi kontainer utama
-        body: Stack(
-          children: [
-            // --- ORNAMEN LAYOUT BACKGROUND REUSABLE ---
-            _buildBackgroundOrnament(
-              top: 350,
-              left: -80,
-              size: 260,
-              color: const Color(0xFF81C784),
-            ),
-            _buildBackgroundOrnament(
-              bottom: 120,
-              right: -100,
-              size: 300,
-              color: const Color(0xFFAED581),
-            ),
+    return Scaffold(
+      // --- DASAR KANVAS PUTIH RESIK PREMIUM ---
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // --- 1. ORNAMEN BACKGROUND PENTOLAN MESH GLOW (SIP!) ---
+          _buildBackgroundOrnament(
+            top: 250,
+            left: -120,
+            size: 320,
+            color: const Color(0xFF81C784),
+          ),
+          _buildBackgroundOrnament(
+            bottom: 80,
+            left: -150,
+            size: 350,
+            color: const Color(0xFFAED581),
+          ),
 
-            // --- SEKTOR ISI KONTEN UTAMA ---
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 16,
-                  ), // Spasi ideal penyeimbang struktur atas
-                  // --- 1. SEKTOR FOTO UTAMA BENTUK CARD HERO ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
+          // --- 2. SEKTOR ISI KONTEN SCROLLABLE ---
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 25), // Bantalan struktur atas
+                // --- 3. SEKTOR HERO IMAGE (FOTO UTAMA) DENGAN PEMBATAS RAUDIUS ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: AspectRatio(
+                    aspectRatio: 3 / 3, // Rasio vertikal tinggi mirip referensi
                     child: Container(
-                      width: double.infinity,
-                      height: 380,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(28),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.12),
@@ -99,104 +80,119 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                       child: Stack(
                         children: [
-                          // Efek bayangan gelap di bawah gambar biar teks putih terbaca jelas
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              height: 140,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(30),
+                          // --- 4. KARTU INFORMASI TRANSPARAN DI ATAS GAMBAR (OVERLAY GLASSMORPHISM) ---
+                          // Perhatiin tata letak kolom ganda (Kiri & Kanan) sesuai referensi boi!
+                          Positioned(
+                            bottom: 20,
+                            left: 20,
+                            right: 20,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(
+                                  sigmaX: 16,
+                                  sigmaY: 16,
                                 ),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.9),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Info Nama, Lokasi, dan Harga di Dalam Card Gambar
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          widget.wisata.name,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: poppinsText.copyWith(
-                                            color: whiteColor,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    // Warna semi-transparan (Glass effect)
+                                    color: Colors.black.withValues(alpha: 0.45),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.25,
+                                      ), // Kilauan tipis edge
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // KOLOM KIRI: NAMA & LOKASI
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(
-                                              Icons.location_on,
-                                              color:
-                                                  Colors.greenAccent.shade400,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                widget.wisata.location,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: interText.copyWith(
-                                                  color: const Color(
-                                                    0xFFE0E0E0,
-                                                  ),
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                            Text(
+                                              widget.wisata.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: poppinsText.copyWith(
+                                                color: whiteColor,
+                                                fontSize: 19,
+                                                fontWeight: FontWeight.bold,
                                               ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.location_on,
+                                                  color: const Color.fromARGB(
+                                                    255,
+                                                    230,
+                                                    230,
+                                                    230,
+                                                  ), // Warna ijo lokasi referensi
+                                                  size: 14,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Expanded(
+                                                  child: Text(
+                                                    widget.wisata.location,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: interText.copyWith(
+                                                      color: Colors.white70,
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Harga Tiket',
-                                        style: interText.copyWith(
-                                          color: Colors.white70,
-                                          fontSize: 13,
-                                        ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Rp ${widget.wisata.price}',
-                                        style: poppinsText.copyWith(
-                                          color: Colors.greenAccent.shade400,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      // KOLOM KANAN: LABEL HARGA & NILAI
+                                      const SizedBox(width: 12),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'Harga',
+                                            style: interText.copyWith(
+                                              color: Colors.white60,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'Rp ${widget.wisata.price}',
+                                            style: poppinsText.copyWith(
+                                              // Hijau Accent sesuai referensi total harga
+                                              color: const Color.fromARGB(
+                                                255,
+                                                231,
+                                                231,
+                                                231,
+                                              ),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -204,192 +200,191 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                   ),
+                ),
 
-                  // --- 2. SEKTOR BLOK INFORMASI & DESKRIPSI ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tentang Wisata',
-                          style: poppinsText.copyWith(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: blackColor,
+                // --- 5. SEKTOR BLOK INFORMASI DESKRIPSI (TETAP AMAN) ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tentang Wisata',
+                        style: poppinsText.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: blackColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Deretan Keripik Info (Chips)
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          _buildInfoChip(
+                            Icons.directions_walk_rounded,
+                            '± ${widget.wisata.distance} dari alun-alun',
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        // Deretan Keripik Info (Chips)
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            _buildInfoChip(
-                              Icons.directions_walk_rounded,
-                              '± ${widget.wisata.distance} dari alun-alun',
-                            ),
-                            _buildInfoChip(
-                              Icons.access_time_filled_rounded,
-                              widget.wisata.openHours,
-                            ),
-                            _buildInfoChip(
-                              Icons.star_rounded,
-                              '${widget.wisata.rating} Rating',
-                              isRating: true,
-                            ),
-                          ],
-                        ),
+                          _buildInfoChip(
+                            Icons.access_time_filled_rounded,
+                            widget.wisata.openHours,
+                          ),
+                          _buildInfoChip(
+                            Icons.star_rounded,
+                            '${widget.wisata.rating} Rating',
+                            isRating: true,
+                          ),
+                        ],
+                      ),
 
-                        // --- TOMBOL AKSI PETUNJUK RUTE MAPS ---
-                        const SizedBox(height: 22),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.6,
-                              ),
-                              side: const BorderSide(
-                                color: Color(
-                                  0xFF2E7D32,
-                                ), // Selaras dengan tema hijau alam boi
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                      // --- TOMBOL AKSI PETUNJUK RUTE MAPS ---
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.6,
                             ),
-                            onPressed: () =>
-                                _openGoogleMaps(widget.wisata.mapsUrl),
-                            icon: const Icon(
-                              Icons.map_rounded,
-                              color: Color(0xFF2E7D32),
-                              size: 20,
+                            side: const BorderSide(
+                              color: Color(
+                                0xFF2E7D32,
+                              ), // Ijo segar tema utama kita boi
+                              width: 1.5,
                             ),
-                            label: Text(
-                              'Lihat Rute Resmi di Google Maps',
-                              style: poppinsText.copyWith(
-                                color: const Color(0xFF2E7D32),
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                        ),
-
-                        // Teks Deskripsi Wisata
-                        const SizedBox(height: 22),
-                        Text(
-                          widget.wisata.description,
-                          style: interText.copyWith(
-                            color: const Color(0xFF4F4F4F),
-                            fontSize: 14,
-                            height: 1.6,
+                          onPressed: () =>
+                              _openGoogleMaps(widget.wisata.mapsUrl),
+                          icon: const Icon(
+                            Icons.map_rounded,
+                            color: Color(0xFF2E7D32),
+                            size: 20,
+                          ),
+                          label: Text(
+                            'Lihat Rute Resmi di Google Maps',
+                            style: poppinsText.copyWith(
+                              color: const Color(0xFF2E7D32),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 120,
-                        ), // Jarak bantalan aman agar tidak tertutup bottom sheet
-                      ],
-                    ),
+                      ),
+
+                      // Teks Deskripsi Wisata
+                      const SizedBox(height: 24),
+                      Text(
+                        widget.wisata.description,
+                        style: interText.copyWith(
+                          // Warna abu gelap biar sinkron dan bersih
+                          color: const Color(0xFF4F4F4F),
+                          fontSize: 14,
+                          height: 1.6,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 120,
+                      ), // Jarak bantalan bottom sheet
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // --- 6. BLOK NAVIGASI TOMBOL ATAS (KEMBALI & FAVORITE) ---
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // TOMBOL KEMBALI (KLONINGAN REFERENSI!)
+                  _buildCircleButton(
+                    icon: Icons.arrow_back_ios_new_rounded,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  // TOMBOL LOVE/FAVORITE (KLONINGAN REFERENSI!)
+                  _buildCircleButton(
+                    icon: widget.wisata.isFavorite
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    iconColor: widget.wisata.isFavorite
+                        ? Colors.redAccent
+                        : Colors.white,
+                    onTap: () {
+                      setState(() {
+                        widget.wisata.isFavorite = !widget.wisata.isFavorite;
+                      });
+                    },
                   ),
                 ],
               ),
             ),
+          ),
+        ],
+      ),
 
-            // --- 3. BLOK NAVIGASI TOMBOL BACK & FAVORITE (DILINDUNGI SAFEAREA) ---
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildCircleButton(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    _buildCircleButton(
-                      icon: widget.wisata.isFavorite
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      iconColor: widget.wisata.isFavorite
-                          ? Colors.redAccent
-                          : Colors.black87,
-                      onTap: () {
-                        setState(() {
-                          widget.wisata.isFavorite = !widget.wisata.isFavorite;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
+      // --- 7. TOMBOL PESAN SEKARANG (BOTTOM SHEET PERMANEN) ---
+      bottomSheet: Container(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, -4),
             ),
           ],
         ),
-
-        // --- TOMBOL PESAN SEKARANG (BOTTOM SHEET PREMIUM) ---
-        bottomSheet: Container(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, -4),
+        child: SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              // Warna Hijau Segar Naventure
+              backgroundColor: const Color(0xFF2E7D32),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          ),
-          child: SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(
-                  0xFF2E7D32,
-                ), // Warna Hijau Segar Naventure
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              elevation: 2,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookingPage(widget.wisata),
                 ),
-                elevation: 2,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BookingPage(widget.wisata),
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Pesan Tiket Sekarang',
+                  style: poppinsText.copyWith(
+                    color: whiteColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Pesan Tiket Sekarang',
-                    style: poppinsText.copyWith(
-                      color: whiteColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Icon(
-                    Icons.confirmation_number_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                const Icon(
+                  Icons.confirmation_number_outlined,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ],
             ),
           ),
         ),
@@ -397,7 +392,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // --- HELPER ORNAMEN BACKGROUND REUSABLE ---
+  // --- HELPER ORNAMEN BACKGROUND radial glow (TETAP AMAN) ---
   Widget _buildBackgroundOrnament({
     double? top,
     double? right,
@@ -418,18 +413,18 @@ class _DetailPageState extends State<DetailPage> {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.25),
-              color.withValues(alpha: 0.08),
+              color.withValues(alpha: 0.17), // Dipenipis biar ultra-clean boi
+              color.withValues(alpha: 0.03),
               color.withValues(alpha: 0.0),
             ],
-            stops: const [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
       ),
     );
   }
 
-  // --- HELPER INFO CHIP PREMIUM ---
+  // --- HELPER INFO CHIP PREMIUM (DIPUTIHIN BIAR RESIK) ---
   Widget _buildInfoChip(IconData icon, String label, {bool isRating = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -458,6 +453,7 @@ class _DetailPageState extends State<DetailPage> {
             label,
             style: interText.copyWith(
               fontSize: 13,
+              // Warna abu gelap resik
               color: const Color(0xFF333333),
               fontWeight: FontWeight.w600,
             ),
@@ -467,23 +463,24 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // --- HELPER TOMBOL LINGKARAN NAVIGASI ATAS ---
+  // --- HELPER TOMBOL LINGKARAN NAVIGASI ATAS (SINKRON REFERENSI!) ---
   Widget _buildCircleButton({
     required IconData icon,
     required VoidCallback onTap,
-    Color iconColor = Colors.black87,
+    Color iconColor = Colors.white, // Default icon putih sesuai referensi
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 42,
-        height: 42,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
+          // Hitam-abu transparan sesuai referensi tombol overlay
+          color: Colors.black.withValues(alpha: 0.3),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),

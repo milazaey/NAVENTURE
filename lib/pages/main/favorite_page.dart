@@ -20,8 +20,10 @@ class _FavoritePageState extends State<FavoritePage> {
         .toList();
 
     return Scaffold(
-      // 1. BIAR GRADASI TEMBUS SAMPAI BELAKANG APPBAR
+      // --- DASAR PUTIH BERSIH ---
+      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
+
       appBar: AppBar(
         title: Text(
           'Destinasi Favorit',
@@ -35,36 +37,36 @@ class _FavoritePageState extends State<FavoritePage> {
         backgroundColor: Colors.transparent, // Transparan premium
         elevation: 0,
       ),
+
       body: Container(
-        // --- 2. RACIKAN GRADASI ALAM YANG SEGER ---
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFE8F5E9), // Hijau mint
-              Color(0xFFF1F8E9), // Hijau kekuningan
-              Color(0xFFE0F2F1), // Soft cyan
-              Colors.white,
-            ],
-            stops: [0.0, 0.4, 0.7, 1.0],
-          ),
-        ),
+        color: Colors.white, // Murni putih kertas boi!
         child: SafeArea(
           child: Stack(
             children: [
-              // --- 3. ORNAMEN BACKGROUND MESH ---
+              // --- TIGA BUNTELAN WARNA ATMOSFERIK (SUPER TIPIS) ---
+
+              // Buntelan 1: Kanan Atas (Soft Emerald Green)
               _buildBackgroundOrnament(
-                top: -50,
-                right: -50,
+                top: -40,
+                right: -40,
                 size: 280,
                 color: const Color(0xFF81C784),
               ),
+
+              // Buntelan 2: Kiri Bawah (Soft Lime Green)
               _buildBackgroundOrnament(
-                bottom: 80,
-                left: -150,
-                size: 350,
+                bottom: 100,
+                left: -100,
+                size: 320,
                 color: const Color(0xFFAED581),
+              ),
+
+              // Buntelan 3: Tengah Kanan (Soft Cyan/Teal)
+              _buildBackgroundOrnament(
+                top: MediaQuery.of(context).size.height * 0.3,
+                right: -80,
+                size: 240,
+                color: const Color(0xFF4DB6AC),
               ),
 
               // --- ISI KONTEN ---
@@ -151,7 +153,7 @@ class _FavoritePageState extends State<FavoritePage> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.50), // Semi transparan
+                color: Colors.white.withValues(alpha: 0.90), // Semi transparan
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: Colors.white.withValues(
@@ -256,11 +258,14 @@ class _FavoritePageState extends State<FavoritePage> {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.35),
-              color.withValues(alpha: 0.15),
+              // Core warna tengah cuma 12% pekat (tipis banget)
+              color.withValues(alpha: 0.18),
+              // Luar tengah makin pudar 3%
+              color.withValues(alpha: 0.05),
+              // Ujung bulatan hilang total biar nge-blend halus dengan putihnya background
               color.withValues(alpha: 0.0),
             ],
-            stops: const [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
       ),
