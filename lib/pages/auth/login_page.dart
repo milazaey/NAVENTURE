@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: _emailController, // <-- TAMBAHAN
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Masukkan email Anda',
@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: _passwordController, // <-- TAMBAHAN
+                    controller: _passwordController,
                     obscureText: _obscureText,
                     decoration: InputDecoration(
                       hintText: 'Masukkan kata sandi Anda',
@@ -164,41 +164,28 @@ class _LoginPageState extends State<LoginPage> {
                         String email = _emailController.text.trim();
                         String password = _passwordController.text.trim();
 
-                        // 1. Validasi kalau ada field yang kosong
-                        if (email.isEmpty || password.isEmpty) {
+                        // Validasi Mutlak sesuai yang lu mau boi!
+                        if (email == 'zenin@gmail.com' &&
+                            password == 'zenin123') {
+                          // Kalau bener, langsung masuk
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MainPage(),
+                            ),
+                          );
+                        } else {
+                          // Kalau salah satu salah (atau kosong), munculin notif merah
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Email dan kata sandi tidak boleh kosong!',
+                                'Email atau Kata Sandi salah!',
                                 style: interText.copyWith(color: whiteColor),
                               ),
                               backgroundColor: Colors.redAccent,
                             ),
                           );
-                          return; // Stop proses
                         }
-
-                        // 2. Validasi harus pake @gmail.com
-                        if (!email.endsWith('@gmail.com')) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Format salah!',
-                                style: interText.copyWith(color: whiteColor),
-                              ),
-                              backgroundColor: Colors.orangeAccent,
-                            ),
-                          );
-                          return; // Stop proses
-                        }
-
-                        // Jika lolos semua validasi
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainPage(),
-                          ),
-                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: secondaryColor,
@@ -255,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'belum Punya Akun? ',
+                        'Belum Punya Akun? ',
                         style: interText.copyWith(
                           color: greyColor,
                           fontSize: 14,
