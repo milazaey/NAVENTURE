@@ -129,9 +129,9 @@ class _DetailPageState extends State<DetailPage> {
                                             const SizedBox(height: 6),
                                             Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.location_on,
-                                                  color: const Color.fromARGB(
+                                                  color: Color.fromARGB(
                                                     255,
                                                     230,
                                                     230,
@@ -225,9 +225,15 @@ class _DetailPageState extends State<DetailPage> {
                         spacing: 12,
                         runSpacing: 12,
                         children: [
+                          // INFO 1: JARAK DARI ALUN-ALUN (BAWAAN MODEL, AMAN!)
                           _buildInfoChip(
                             Icons.directions_walk_rounded,
                             '± ${widget.wisata.distance} dari alun-alun',
+                          ),
+                          // INFO 2: JARAK DARI LOKASI USER (TAMBAHAN BARU!)
+                          _buildInfoChip(
+                            Icons.near_me_rounded,
+                            '± 5 km dari lokasimu', // Nanti tinggal lu ganti pake variabel GPS
                           ),
                           _buildInfoChip(
                             Icons.access_time_filled_rounded,

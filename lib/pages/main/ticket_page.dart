@@ -296,7 +296,7 @@ class TicketPage extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.40),
+              color.withValues(alpha: 0.20),
               color.withValues(alpha: 0.05),
               color.withValues(alpha: 0.0),
             ],

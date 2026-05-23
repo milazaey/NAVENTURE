@@ -18,6 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Wisata> sliderWisata = []; // Buat slider atas (hidden gems)
   List<Wisata> nearestWisata = []; // Buat list bawah (wisata terdekat)
+  Map<String, double> wisataDistances = {}; // Buat nyimpen data jarak
   bool isLocationFetched = false; // Penanda kalau GPS sukses
 
   late PageController _pageController;
@@ -61,25 +62,27 @@ class _HomePageState extends State<HomePage> {
     );
 
     List<Wisata> tempList = List.from(mockWisata);
-    tempList.sort((a, b) {
-      double distanceToA = Geolocator.distanceBetween(
+    Map<String, double> tempDistances = {}; // Bikin penampung sementara
+
+    // Hitung dan simpan jarak tiap wisata ke dalam Map
+    for (var wisata in tempList) {
+      tempDistances[wisata.name] = Geolocator.distanceBetween(
         userPosition.latitude,
         userPosition.longitude,
-        a.latitude,
-        a.longitude,
+        wisata.latitude,
+        wisata.longitude,
       );
-      double distanceToB = Geolocator.distanceBetween(
-        userPosition.latitude,
-        userPosition.longitude,
-        b.latitude,
-        b.longitude,
-      );
-      return distanceToA.compareTo(distanceToB);
-    });
+    }
+
+    // Sort list berdasarkan jarak yang ada di Map
+    tempList.sort(
+      (a, b) => tempDistances[a.name]!.compareTo(tempDistances[b.name]!),
+    );
 
     if (mounted) {
       setState(() {
         nearestWisata = tempList;
+        wisataDistances = tempDistances; // Simpan hasil jarak ke State UI
         isLocationFetched = true;
       });
     }
@@ -330,9 +333,15 @@ class _HomePageState extends State<HomePage> {
                               ? 5
                               : nearestWisata.length,
                           itemBuilder: (context, index) {
+                            final wisata = nearestWisata[index];
+                            // Ambil data jarak (default 0 kalau error)
+                            final distance =
+                                wisataDistances[wisata.name] ?? 0.0;
+
                             return _buildCompactWisataCard(
                               context,
-                              nearestWisata[index],
+                              wisata,
+                              distance, // Passing jaraknya ke fungsi Card
                             );
                           },
                         ),
@@ -441,7 +450,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCompactWisataCard(BuildContext context, Wisata wisata) {
+  Widget _buildCompactWisataCard(
+    BuildContext context,
+    Wisata wisata,
+    double distance,
+  ) {
+    // LOGIKA FORMAT JARAK (Lebih dari 1000m -> jadi km, kurang -> m)
+    String distanceStr = distance > 1000
+        ? '${(distance / 1000).toStringAsFixed(1)} km'
+        : '${distance.toStringAsFixed(0)} m';
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -521,37 +539,83 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         const SizedBox(height: 12),
+                        // --- BAGIAN YANG DIPERBAIKI (TIDAK OVERFLOW LAGI) ---
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
+                            // Bungkus pakai Expanded & Wrap biar fleksibel
+                            Expanded(
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 6,
                                 children: [
-                                  const Icon(
-                                    Icons.star_rounded,
-                                    color: Colors.orange,
-                                    size: 14,
+                                  // --- CHIP RATING ---
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.star_rounded,
+                                          color: Colors.orange,
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          wisata.rating.toString(),
+                                          style: interText.copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.orange[800],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    wisata.rating.toString(),
-                                    style: interText.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange[800],
+                                  // --- CHIP JARAK ---
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.directions_walk_rounded,
+                                          color: Colors.blue[600],
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          distanceStr,
+                                          style: interText.copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue[700],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            // --- HARGA ---
                             Text(
                               'Rp ${wisata.price}',
                               style: poppinsText.copyWith(
