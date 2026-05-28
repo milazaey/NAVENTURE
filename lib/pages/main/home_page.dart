@@ -6,7 +6,37 @@ import '../../widgets/wisata_card.dart';
 import 'filter_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'detail_page.dart';
-import 'dart:ui'; // WAJIB BUAT BLUR GLASSMORPHISM
+import 'dart:ui';
+
+// ==========================================
+// DUMMY MODEL BUAT BANNER UMKM SEMENTARA
+// (Biar gak error kalau lu belum punya gambarnya)
+// ==========================================
+class UmkmBanner {
+  final String title;
+  final String subtitle;
+  final String imageAsset;
+
+  UmkmBanner(this.title, this.subtitle, this.imageAsset);
+}
+
+final List<UmkmBanner> umkmBanners = [
+  UmkmBanner(
+    'Kopi Khas Jampit',
+    'Diskon 20% khusus pengguna Naventure!',
+    'assets/img/kopijampit.jpg', // <-- Masukin path gambar 1 lu di sini
+  ),
+  UmkmBanner(
+    'Oleh-oleh Tape Manis',
+    'Beli 3 Kotak Gratis 1, Mampir Yuk!',
+    'assets/img/tape.jpg', // <-- Gambar 2
+  ),
+  UmkmBanner(
+    'Sewa Jeep Ijen Termurah',
+    'Aman, Nyaman, dan Terpercaya.',
+    'assets/img/jeep.jpg', // <-- Gambar 3
+  ),
+];
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,22 +46,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Wisata> sliderWisata = []; // Buat slider atas (hidden gems)
-  List<Wisata> nearestWisata = []; // Buat list bawah (wisata terdekat)
-  Map<String, double> wisataDistances = {}; // Buat nyimpen data jarak
-  bool isLocationFetched = false; // Penanda kalau GPS sukses
+  List<Wisata> sliderWisata = [];
+  List<Wisata> nearestWisata = [];
+  Map<String, double> wisataDistances = {};
+  bool isLocationFetched = false;
 
+  // Controller buat Slider Wisata
   late PageController _pageController;
   Timer? _timer;
   int _currentPage = 0;
+
+  // Controller buat Slider UMKM
+  late PageController _umkmPageController;
+  Timer? _umkmTimer;
+  int _currentUmkmPage = 0;
 
   @override
   void initState() {
     super.initState();
     sliderWisata = List.from(mockWisata);
 
-    _pageController = PageController(initialPage: 0, viewportFraction: 0.85);
+    // Wisata Card dikecilin dikit viewport-nya biar gak kegedean
+    _pageController = PageController(initialPage: 0, viewportFraction: 0.82);
     _startAutoSlider();
+
+    // UMKM Controller
+    _umkmPageController = PageController(initialPage: 0, viewportFraction: 0.9);
+    _startUmkmSlider();
+
     _getSortWisataTerdekat();
   }
 
@@ -39,9 +81,13 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _timer?.cancel();
     _pageController.dispose();
+
+    _umkmTimer?.cancel();
+    _umkmPageController.dispose();
     super.dispose();
   }
 
+  // --- LOGIKA LOKASI AMAN GAK DISENTUH BOI ---
   Future<void> _getSortWisataTerdekat() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -62,9 +108,8 @@ class _HomePageState extends State<HomePage> {
     );
 
     List<Wisata> tempList = List.from(mockWisata);
-    Map<String, double> tempDistances = {}; // Bikin penampung sementara
+    Map<String, double> tempDistances = {};
 
-    // Hitung dan simpan jarak tiap wisata ke dalam Map
     for (var wisata in tempList) {
       tempDistances[wisata.name] = Geolocator.distanceBetween(
         userPosition.latitude,
@@ -74,7 +119,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    // Sort list berdasarkan jarak yang ada di Map
     tempList.sort(
       (a, b) => tempDistances[a.name]!.compareTo(tempDistances[b.name]!),
     );
@@ -82,14 +126,14 @@ class _HomePageState extends State<HomePage> {
     if (mounted) {
       setState(() {
         nearestWisata = tempList;
-        wisataDistances = tempDistances; // Simpan hasil jarak ke State UI
+        wisataDistances = tempDistances;
         isLocationFetched = true;
       });
     }
   }
 
   void _startAutoSlider() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
       if (sliderWisata.isEmpty) return;
 
       if (_currentPage < sliderWisata.length - 1) {
@@ -103,6 +147,27 @@ class _HomePageState extends State<HomePage> {
           _currentPage,
           duration: const Duration(milliseconds: 1200),
           curve: Curves.easeInOutQuart,
+        );
+      }
+    });
+  }
+
+  // Auto Slider buat UMKM
+  void _startUmkmSlider() {
+    _umkmTimer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      if (umkmBanners.isEmpty) return;
+
+      if (_currentUmkmPage < umkmBanners.length - 1) {
+        _currentUmkmPage++;
+      } else {
+        _currentUmkmPage = 0;
+      }
+
+      if (_umkmPageController.hasClients) {
+        _umkmPageController.animateToPage(
+          _currentUmkmPage,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.fastOutSlowIn,
         );
       }
     });
@@ -127,15 +192,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Murni putih kertas
+      backgroundColor: Colors.white,
       body: Container(
-        // --- 1. BACKGROUND PUTIH BERSIH ---
-        color: Colors.white, // Gak ada lagi LinearGradient
+        color: Colors.white,
         child: SafeArea(
           child: Stack(
             children: [
-              // --- 2. ORNAMEN BULAT ALAM (Background Mesh) ---
-              // Posisi disebar biar glow-nya merata di kanvas putih
               _buildBackgroundOrnament(
                 top: -50,
                 left: -50,
@@ -155,7 +217,6 @@ class _HomePageState extends State<HomePage> {
                 color: const Color(0xFFAED581),
               ),
 
-              // --- 3. KONTEN UTAMA ---
               SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +352,7 @@ class _HomePageState extends State<HomePage> {
 
                     // --- LIST WISATA (AUTO-SLIDER) ---
                     SizedBox(
-                      height: 350,
+                      height: 310, // <-- Ukuran Card udah dikecilin di sini boi
                       child: sliderWisata.isEmpty
                           ? _buildEmptyState()
                           : PageView.builder(
@@ -309,6 +370,51 @@ class _HomePageState extends State<HomePage> {
                             ),
                     ),
                     const SizedBox(height: 30),
+
+                    // ==========================================
+                    // --- IKLAN UMKM (SLIDER BARU DI SINI BOI) ---
+                    // ==========================================
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.storefront,
+                            color: Colors.orange[800],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Support UMKM Lokal',
+                            style: poppinsText.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: blackColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 100, // Tinggi banner
+                      child: PageView.builder(
+                        controller: _umkmPageController,
+                        itemCount: umkmBanners.length,
+                        onPageChanged: (index) {
+                          _currentUmkmPage = index;
+                        },
+                        itemBuilder: (context, index) {
+                          final banner = umkmBanners[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: _buildUmkmBanner(banner),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // ==========================================
 
                     // --- WISATA TERDEKAT ---
                     if (isLocationFetched) ...[
@@ -334,14 +440,13 @@ class _HomePageState extends State<HomePage> {
                               : nearestWisata.length,
                           itemBuilder: (context, index) {
                             final wisata = nearestWisata[index];
-                            // Ambil data jarak (default 0 kalau error)
                             final distance =
                                 wisataDistances[wisata.name] ?? 0.0;
 
                             return _buildCompactWisataCard(
                               context,
                               wisata,
-                              distance, // Passing jaraknya ke fungsi Card
+                              distance,
                             );
                           },
                         ),
@@ -361,6 +466,90 @@ class _HomePageState extends State<HomePage> {
   // ===========================================================================
   // FUNGSI HELPER (ALAT MASAK)
   // ===========================================================================
+
+  // Widget Banner UMKM
+  Widget _buildUmkmBanner(UmkmBanner banner) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        // --- MASUKIN GAMBARNYA DI SINI BOI ---
+        image: DecorationImage(
+          image: AssetImage(banner.imageAsset),
+          fit: BoxFit
+              .cover, // Biar gambarnya otomatis menuhin container tanpa gepeng
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      // --- BUNGKUS PAKAI GRADASI HITAM TRANSPARAN BIAR TEKS TETEP KEBACA ---
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [
+              Colors.black.withValues(
+                alpha: 0.85,
+              ), // Kiri gelap banget buat teks
+              Colors.black.withValues(alpha: 0.20), // Kanan agak transparan
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    banner.title,
+                    style: poppinsText.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    banner.subtitle,
+                    style: interText.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 12,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildBackgroundOrnament({
     double? top,
@@ -382,14 +571,11 @@ class _HomePageState extends State<HomePage> {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              // Core warna tengah cuma 12% pekat (tipis banget)
               color.withValues(alpha: 0.17),
-              // Luar tengah makin pudar 3%
               color.withValues(alpha: 0.03),
-              // Ujung bulatan hilang total biar nge-blend halus
               color.withValues(alpha: 0.0),
             ],
-            stops: const [0.0, 0.6, 1.0], // Sync dengan style sebelumnya
+            stops: const [0.0, 0.6, 1.0],
           ),
         ),
       ),
@@ -455,7 +641,6 @@ class _HomePageState extends State<HomePage> {
     Wisata wisata,
     double distance,
   ) {
-    // LOGIKA FORMAT JARAK (Lebih dari 1000m -> jadi km, kurang -> m)
     String distanceStr = distance > 1000
         ? '${(distance / 1000).toStringAsFixed(1)} km'
         : '${distance.toStringAsFixed(0)} m';
@@ -476,7 +661,7 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.50), // card terdekat
+                color: Colors.white.withValues(alpha: 0.50),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.4),
@@ -539,17 +724,14 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        // --- BAGIAN YANG DIPERBAIKI (TIDAK OVERFLOW LAGI) ---
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Bungkus pakai Expanded & Wrap biar fleksibel
                             Expanded(
                               child: Wrap(
                                 spacing: 8,
                                 runSpacing: 6,
                                 children: [
-                                  // --- CHIP RATING ---
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
@@ -581,7 +763,6 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
                                   ),
-                                  // --- CHIP JARAK ---
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
@@ -615,7 +796,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            // --- HARGA ---
                             Text(
                               'Rp ${wisata.price}',
                               style: poppinsText.copyWith(

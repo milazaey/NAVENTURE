@@ -302,6 +302,41 @@ class _BookingPageState extends State<BookingPage> {
                                 ),
                               ],
                             ),
+
+                            // ===== TAMBAHAN KETERANGAN EXPIRED DI SINI BOI =====
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.orange.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline,
+                                    color: Colors.orange,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Catatan: Tiket yang dipesan hanya berlaku dan akan kedaluwarsa (expired) dalam waktu 1x24 jam.',
+                                      style: interText.copyWith(
+                                        fontSize: 12,
+                                        color: Colors.orange[800],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // ===================================================
                           ],
                         ),
                       ),

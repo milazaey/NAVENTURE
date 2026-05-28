@@ -81,6 +81,9 @@ flutter:
     - assets/img/bukitmahadewa.jpg
     - assets/img/labangseng.jpeg
     - assets/img/tancakkembar.png
+    - assets/img/kopijampit.jpg
+    - assets/img/tape.jpg
+    - assets/img/jeep.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

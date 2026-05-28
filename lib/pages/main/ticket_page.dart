@@ -24,9 +24,11 @@ class TicketPage extends StatelessWidget {
           ),
           centerTitle: true,
           bottom: TabBar(
-            indicatorColor: const Color(0xFF2E7D32),
+            indicatorColor: const Color(
+              0xFF2A5934,
+            ), // Warna indikator lebih kalem
             indicatorWeight: 3,
-            labelColor: const Color(0xFF2E7D32),
+            labelColor: const Color(0xFF2A5934),
             unselectedLabelColor: greyColor,
             labelStyle: poppinsText.copyWith(
               fontWeight: FontWeight.bold,
@@ -52,18 +54,18 @@ class TicketPage extends StatelessWidget {
   Widget _buildTicketContent({required bool isActive}) {
     return Stack(
       children: [
-        // Ornamen bulat tipis disesuaikan biar pas di latar putih
+        // Ornamen di-soft-kan warnanya biar nggak nabrak sama tiket
         _buildBackgroundOrnament(
           top: -50,
           right: -50,
           size: 280,
-          color: const Color(0xFF81C784),
+          color: const Color(0xFFC8E6C9), // Hijau sangat pudar
         ),
         _buildBackgroundOrnament(
           bottom: 100,
           left: -150,
           size: 350,
-          color: const Color(0xFFAED581),
+          color: const Color(0xFFE8F5E9), // Hijau hampir putih
         ),
         _buildTicketList(isActive: isActive),
       ],
@@ -96,24 +98,27 @@ class TicketPage extends StatelessWidget {
 
   // --- KARTU TIKET BARU ---
   Widget _buildTicketCard(Ticket ticket) {
+    // Warna diubah jadi Forest Green yang lebih kalem dan premium
     Color cardColor = ticket.isActive
-        ? const Color(0xFF388E3C)
-        : Colors.grey.shade600;
+        ? const Color(0xFF346944)
+        : Colors.grey.shade500;
 
     Color textColor = Colors.white;
     Color subTextColor = Colors.white.withValues(alpha: 0.85);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      height: 195,
+      height: 215,
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: Colors.black.withValues(
+              alpha: 0.08,
+            ), // Shadow dihalusin dikit
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -127,7 +132,9 @@ class TicketPage extends StatelessWidget {
               child: Icon(
                 Icons.qr_code_2,
                 size: 85,
-                color: Colors.black.withValues(alpha: 0.85),
+                color: Colors.white.withValues(
+                  alpha: 0.95,
+                ), // Ubah ke putih biar kontrasnya pas dengan hijau gelap
               ),
             ),
 
@@ -180,9 +187,55 @@ class TicketPage extends StatelessWidget {
                       textColor,
                     ),
                     _buildTicketInfo(
-                      'Sewa Tour Guide Lokal x${ticket.guideCount}',
+                      'Tour Guide Lokal x${ticket.guideCount}',
                       textColor,
                     ),
+
+                    // ===== LABEL EXPIRED =====
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: ticket.isActive
+                            ? const Color(
+                                0xFFC62828,
+                              ) // Merah bata (Red 800) yang nggak terlalu mencolok
+                            : Colors.black.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            ticket.isActive
+                                ? Icons.timer_outlined
+                                : Icons.block,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            // Mencegah teks label bikin error kalau kepanjangan
+                            child: Text(
+                              ticket.isActive
+                                  ? 'Expired 1x24 Jam'
+                                  : 'Tiket Kedaluwarsa',
+                              style: interText.copyWith(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // =====================================
                   ],
                 ),
               ),
@@ -215,7 +268,7 @@ class TicketPage extends StatelessWidget {
                       );
                     },
                   ),
-                  // Lubang Guntingan Atas (Sekarang nyatu sempurna karena background-nya putih)
+                  // Lubang Guntingan Atas
                   Positioned(
                     top: -14,
                     left: -2,
@@ -262,11 +315,15 @@ class TicketPage extends StatelessWidget {
     );
   }
 
+  // ===== FIX OVERFLOW DI SINI BOI =====
+  // Menambahkan maxLines dan TextOverflow.ellipsis biar teks kepanjangan otomatis kepotong jadi "..."
   Widget _buildTicketInfo(String text, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: Text(
         text,
+        maxLines: 1, // Kunci fix overflow horizontal
+        overflow: TextOverflow.ellipsis, // Kunci fix overflow horizontal
         style: interText.copyWith(
           color: color,
           fontSize: 12,
@@ -296,7 +353,9 @@ class TicketPage extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withValues(alpha: 0.20),
+              color.withValues(
+                alpha: 0.15,
+              ), // Opasitas diturunin biar lebih kalem
               color.withValues(alpha: 0.05),
               color.withValues(alpha: 0.0),
             ],
