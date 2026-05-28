@@ -258,8 +258,11 @@ class _DetailPageState extends State<DetailPage> {
                               alpha: 0.6,
                             ),
                             side: const BorderSide(
-                              color: Color(
-                                0xFF2E7D32,
+                              color: Color.fromARGB(
+                                255,
+                                29,
+                                78,
+                                32,
                               ), // Ijo segar tema utama kita boi
                               width: 1.5,
                             ),
@@ -271,13 +274,13 @@ class _DetailPageState extends State<DetailPage> {
                               _openGoogleMaps(widget.wisata.mapsUrl),
                           icon: const Icon(
                             Icons.map_rounded,
-                            color: Color(0xFF2E7D32),
+                            color: Color.fromARGB(255, 29, 78, 32),
                             size: 20,
                           ),
                           label: Text(
                             'Lihat Rute Resmi di Google Maps',
                             style: poppinsText.copyWith(
-                              color: const Color(0xFF2E7D32),
+                              color: const Color.fromARGB(255, 29, 78, 32),
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -359,7 +362,7 @@ class _DetailPageState extends State<DetailPage> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               // Warna Hijau Segar Naventure
-              backgroundColor: const Color(0xFF2E7D32),
+              backgroundColor: const Color.fromARGB(255, 29, 78, 32),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../main_page.dart';
-import 'ticket_page.dart';
 
 class SuccessPage extends StatelessWidget {
   final int totalBayar;
