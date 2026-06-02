@@ -305,7 +305,7 @@ class TicketPage extends StatelessWidget {
                 child: Icon(
                   Icons.picture_as_pdf_outlined,
                   color: textColor,
-                  size: 28,
+                  size: 1,
                 ),
               ),
             ),

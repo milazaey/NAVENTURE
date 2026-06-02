@@ -376,28 +376,14 @@ class _HomePageState extends State<HomePage> {
                     // ==========================================
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.storefront,
-                            color: Colors.orange[800],
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Support UMKM Lokal',
-                            style: poppinsText.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: blackColor,
-                            ),
-                          ),
+                      child: Row(children: [
+                          
                         ],
                       ),
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 100, // Tinggi banner
+                      height: 110, // Tinggi banner
                       child: PageView.builder(
                         controller: _umkmPageController,
                         itemCount: umkmBanners.length,
@@ -486,18 +472,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      // --- BUNGKUS PAKAI GRADASI HITAM TRANSPARAN BIAR TEKS TETEP KEBACA ---
+      // --- GRADASI DIPERBAIKI BIAR GAK NUTUPIN GAMBAR ---
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ), // Padding dikecilin dikit
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: [
-              Colors.black.withValues(
-                alpha: 0.85,
-              ), // Kiri gelap banget buat teks
-              Colors.black.withValues(alpha: 0.20), // Kanan agak transparan
+              Colors.black.withValues(alpha: 0.85), // Kiri gelap buat alas teks
+              Colors
+                  .transparent, // Kanan dibikin transparan total biar gambar promosi kelihatan
             ],
+            stops: const [0.0, 0.6], // Hitamnya stop di 60% area banner
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
@@ -505,6 +494,7 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
             Expanded(
+              flex: 3, // Ngebatesin teks biar gak terlalu panjang ke kanan
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -514,17 +504,17 @@ class _HomePageState extends State<HomePage> {
                     style: poppinsText.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 13, // <-- FONT SIZE TITLE DIKECILIN
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     banner.subtitle,
                     style: interText.copyWith(
                       color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 12,
+                      fontSize: 11, // <-- FONT SIZE SUBTITLE DIKECILIN
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -532,9 +522,12 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const Expanded(
+              flex: 1,
+              child: SizedBox(),
+            ), // Jarak kosong biar gambar kanan terekspos
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
@@ -542,7 +535,7 @@ class _HomePageState extends State<HomePage> {
               child: const Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.white,
-                size: 14,
+                size: 12, // Icon panah juga ikut dikecilin dikit
               ),
             ),
           ],
